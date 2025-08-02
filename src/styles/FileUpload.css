@@ -1,0 +1,168 @@
+/* Container */
+.upload-container {
+  max-width: 1000px;
+  margin: auto;
+  padding: 20px;
+  font-family: "Segoe UI", sans-serif;
+}
+
+/* Heading */
+.upload-container h2 {
+  margin-bottom: 20px;
+  text-align: center;
+  color: #333;
+}
+
+/* Upload Box */
+.upload-box {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 25px;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-box input[type="file"] {
+  flex: 1;
+  min-width: 180px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.upload-box button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: #4f46e5;
+  color: #fff;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.upload-box button:hover {
+  background-color: #4338ca;
+}
+
+/* Document List */
+.file-list {
+  display: grid;
+  gap: 15px;
+}
+
+.doc-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f9fafb;
+  padding: 14px 18px;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  transition: background 0.3s;
+}
+
+.doc-item:hover {
+  background: #f1f5f9;
+}
+
+/* File Details */
+.doc-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.doc-icon {
+  width: 36px;
+  height: 36px;
+}
+
+.doc-left p {
+  margin: 0;
+  font-weight: 500;
+  color: #222;
+}
+
+.doc-left small {
+  color: #555;
+}
+
+/* Action Buttons */
+.doc-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.doc-actions button,
+.doc-actions a {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #4f46e5;
+  font-size: 18px;
+}
+
+.doc-actions button:hover,
+.doc-actions a:hover {
+  color: #4338ca;
+}
+
+/* Preview Modal */
+.preview-modal {
+  background: #fff;
+  padding: 20px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow: auto;
+  border-radius: 10px;
+  outline: none;
+  position: relative;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.close-btn {
+  background-color: #ff4d4d;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  float: right;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+/* Responsive */
+@media screen and (max-width: 768px) {
+  .upload-box {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .doc-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .doc-actions {
+    justify-content: flex-start;
+  }
+}

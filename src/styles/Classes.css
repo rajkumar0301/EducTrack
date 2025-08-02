@@ -1,0 +1,60 @@
+.classes-container {
+  max-width: 1000px;
+  margin: auto;
+  padding: 20px;
+}
+.class-form, .search-export {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.class-form input, .search-export input {
+  padding: 10px;
+  flex: 1;
+  min-width: 200px;
+}
+button {
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.delete-btn {
+  background: crimson;
+}
+.classes-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.classes-table th, .classes-table td {
+  border: 1px solid #ccc;
+  padding: 9px;
+  text-align: left;
+}
+@media (max-width: 550px) {
+  .classes-table thead {
+    display: none;
+  }
+  .classes-table tr {
+    display: block;
+    margin-bottom: 15px;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+  }
+  .classes-table td {
+    display: block;
+    text-align: right;
+    padding-left: 50%;
+    position: relative;
+  }
+  .classes-table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 10px;
+    font-weight: bold;
+    text-align: left;
+  }
+}

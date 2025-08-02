@@ -1,0 +1,178 @@
+import React, { useState, useEffect } from "react";
+import { supabase } from "../supabaseClient";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import "../styles/Tasks.css";
+
+const Task = ({ userId }) => {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [dueDate, setDueDate] = useState("");
+  const [tasks, setTasks] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+  const fetchTasks = async () => {
+    const { data, error } = await supabase
+      .from("tasks")
+      .select("*")
+      .eq("user_id", userId)
+      .order("due_date", { ascending: true });
+    if (!error) setTasks(data);
+  };
+
+  const handleAddTask = async () => {
+    if (!title) return alert("Title required!");
+    const { error } = await supabase.from("tasks").insert([
+      {
+        user_id: userId,
+        title,
+        description,
+        due_date: dueDate,
+        status: "Pending",
+      },
+    ]);
+    if (!error) {
+      setTitle("");
+      setDescription("");
+      setDueDate("");
+      fetchTasks();
+    } else {
+      console.error("Insert failed:", error);
+    }
+  };
+
+  const markAsDone = async (id) => {
+    await supabase.from("tasks").update({ status: "Done" }).eq("id", id);
+    fetchTasks();
+  };
+
+  const deleteTask = async (id) => {
+    await supabase.from("tasks").delete().eq("id", id);
+    fetchTasks();
+  };
+
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+    doc.text("📋 Task List", 14, 15);
+    const tableData = tasks.map((task) => [
+      task.title,
+      task.description,
+      task.due_date || "N/A",
+      task.status,
+    ]);
+    doc.autoTable({
+      head: [["Title", "Description", "Due Date", "Status"]],
+      body: tableData,
+      startY: 20,
+    });
+    doc.save("task-list.pdf");
+  };
+
+  const filteredTasks = tasks
+    .filter((task) => task.title.toLowerCase().includes(searchTerm))
+    .filter((task) => {
+      if (statusFilter === "All") return true;
+      return task.status === statusFilter;
+    });
+
+  return (
+    <div className="task-container">
+      <h2>📘 Add New Task</h2>
+      <div className="task-form">
+        <input
+          type="text"
+          placeholder="Title *"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <textarea
+          placeholder="Description (optional)"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+        <input
+          type="date"
+          value={dueDate}
+          onChange={(e) => setDueDate(e.target.value)}
+        />
+        <button onClick={handleAddTask}>Add Task</button>
+      </div>
+
+      <div className="task-toolbar">
+        <input
+          type="text"
+          placeholder="🔍 Search by title"
+          className="search-input"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value.toLowerCase())}
+        />
+
+        <div className="status-filter">
+          <button
+            onClick={() => setStatusFilter("All")}
+            className={statusFilter === "All" ? "active" : ""}
+          >
+            🔁 All
+          </button>
+          <button
+            onClick={() => setStatusFilter("Pending")}
+            className={statusFilter === "Pending" ? "active" : ""}
+          >
+            🟡 Pending
+          </button>
+          <button
+            onClick={() => setStatusFilter("Done")}
+            className={statusFilter === "Done" ? "active" : ""}
+          >
+            ✅ Done
+          </button>
+        </div>
+
+        <button onClick={exportToPDF} className="export-btn">
+          📤 Export to PDF
+        </button>
+      </div>
+
+      <h2>🗂️ Your Tasks</h2>
+      <div className="task-list">
+        {filteredTasks.length === 0 ? (
+          <p>No matching tasks.</p>
+        ) : (
+          filteredTasks.map((task) => (
+            <div
+              className={`task-card ${task.status === "Done" ? "done" : ""}`}
+              key={task.id}
+            >
+              <h3>{task.title}</h3>
+              <p>{task.description}</p>
+              <p>📅 Due: {task.due_date || "No due date"}</p>
+              <p>
+                Status:{" "}
+                <span className={`status ${task.status.toLowerCase()}`}>
+                  {task.status}
+                </span>
+              </p>
+              <div className="task-actions">
+                {task.status !== "Done" && (
+                  <button onClick={() => markAsDone(task.id)}>
+                    ✅ Mark as Done
+                  </button>
+                )}
+                <button className="delete" onClick={() => deleteTask(task.id)}>
+                  🗑 Delete
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default Task;

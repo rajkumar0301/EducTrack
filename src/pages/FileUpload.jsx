@@ -3,9 +3,7 @@ import { supabase } from "../supabaseClient";
 import toast, { Toaster } from "react-hot-toast";
 import Modal from "react-modal";
 import jsPDF from "jspdf";
-// import autoTable from "jspdf-autotable";
 import "../styles/FileUpload.css";
-
 
 Modal.setAppElement("#root");
 
@@ -15,6 +13,7 @@ const FileUpload = () => {
   const [loading, setLoading] = useState(true);
   const [previewUrl, setPreviewUrl] = useState(null);
 
+  // Fetch files from Supabase table
   const fetchFiles = async () => {
     setLoading(true);
     const { data: { user } } = await supabase.auth.getUser();
@@ -33,17 +32,18 @@ const FileUpload = () => {
     fetchFiles();
   }, []);
 
+  // Upload handler
   const handleUpload = async () => {
     if (!file) return toast.error("Select a file first");
 
     const { data: { user } } = await supabase.auth.getUser();
     const filePath = `${user.id}/${Date.now()}_${file.name}`;
 
-    const { error } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from("documents")
       .upload(filePath, file);
 
-    if (error) return toast.error("Upload failed");
+    if (uploadError) return toast.error("Upload failed");
 
     const { data: urlData } = supabase.storage
       .from("documents")
@@ -53,6 +53,7 @@ const FileUpload = () => {
       user_id: user.id,
       filename: file.name,
       url: urlData.publicUrl,
+      file_path: filePath, // ✅ Store correct path for deletion
     });
 
     if (!dbError) {
@@ -62,37 +63,52 @@ const FileUpload = () => {
     }
   };
 
+  // Delete handler
   const handleDelete = async (doc) => {
-    const filePath = doc.url.split("/documents/")[1];
-    await supabase.storage.from("documents").remove([filePath]);
+    // Delete from storage
+    const { error: storageError } = await supabase
+      .storage
+      .from("documents")
+      .remove([doc.file_path]);
 
-    const { error } = await supabase
+    if (storageError) {
+      toast.error("Storage delete failed");
+      console.error(storageError.message);
+      return;
+    }
+
+    // Delete from DB
+    const { error: dbError } = await supabase
       .from("documents")
       .delete()
       .eq("id", doc.id);
 
-    if (!error) {
-      toast.success("Deleted");
-      fetchFiles();
+    if (dbError) {
+      toast.error("Database delete failed");
+      console.error(dbError.message);
+      return;
     }
+
+    toast.success("Document deleted");
+    fetchFiles(); // or update local state
   };
 
+  // Export documents list as PDF
   const handleExportPDF = () => {
     const doc = new jsPDF();
     doc.text("Uploaded Documents", 14, 15);
 
     doc.autoTable({
-    head: [["#", "File Name", "Uploaded At"]],
-    body: documents.map((file, index) => [
-    index + 1,
-    file.filename,
-    new Date(file.created_at).toLocaleString(),
-    ]),
-    startY: 25,
+      head: [["#", "File Name", "Uploaded At"]],
+      body: documents.map((file, index) => [
+        index + 1,
+        file.filename,
+        new Date(file.created_at).toLocaleString(),
+      ]),
+      startY: 25,
     });
 
     doc.save("documents.pdf");
-
   };
 
   return (

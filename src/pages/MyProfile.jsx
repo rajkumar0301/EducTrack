@@ -17,10 +17,9 @@ const MyProfile = () => {
   const [school, setSchool] = useState("");
   const [year, setYear] = useState("");
   const [educationList, setEducationList] = useState([]);
-   const [showModal, setShowModal] = useState(false);
-  
+  const [showModal, setShowModal] = useState(false);
+  const [cacheBuster, setCacheBuster] = useState(Date.now()); // 🆕 For forcing image reload
 
-  // Fetch user info
   useEffect(() => {
     const fetchUser = async () => {
       setLoading(true);
@@ -30,14 +29,10 @@ const MyProfile = () => {
 
       if (user) {
         setEmail(user.email);
-
         setAvatarUrl(user.user_metadata?.avatar_url || "");
-
-
         setName(user.user_metadata?.name || "");
         setMobile(user.user_metadata?.mobile || "");
         setBio(user.user_metadata?.bio || "");
-
         fetchEducation(user.id);
       }
       setLoading(false);
@@ -56,61 +51,59 @@ const MyProfile = () => {
     fetchUser();
   }, []);
 
-const handleUpload = async (e) => {
-  const file = e.target.files[0];
-  if (!file) return toast.error("No file selected");
+  const handleUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return toast.error("No file selected");
 
-  setUploading(true);
+    setUploading(true);
 
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
 
-  if (userError || !user) {
-    toast.error("User not found");
-    setUploading(false);
-    return;
-  }
+    if (userError || !user) {
+      toast.error("User not found");
+      setUploading(false);
+      return;
+    }
 
-  const fileExt = file.name.split(".").pop();
-  const filePath = `${user.id}.${fileExt}`;
+    const fileExt = file.name.split(".").pop();
+    const filePath = `${user.id}.${fileExt}`;
 
-  const { error: uploadError } = await supabase.storage
-    .from("avatars")
-    .upload(filePath, file, {
-      upsert: true,
-      contentType: file.type,
+    const { error: uploadError } = await supabase.storage
+      .from("avatars")
+      .upload(filePath, file, {
+        upsert: true,
+        contentType: file.type,
+      });
+
+    if (uploadError) {
+      toast.error("Upload failed");
+      console.error(uploadError.message);
+      setUploading(false);
+      return;
+    }
+
+    const { data: urlData } = supabase.storage
+      .from("avatars")
+      .getPublicUrl(filePath);
+    const publicUrl = urlData.publicUrl;
+
+    const { error: updateError } = await supabase.auth.updateUser({
+      data: { avatar_url: publicUrl },
     });
 
-  if (uploadError) {
-    toast.error("Upload failed");
-    console.error(uploadError.message);
+    if (updateError) {
+      toast.error("Failed to save avatar URL");
+    } else {
+      setAvatarUrl(publicUrl);
+      setCacheBuster(Date.now()); // 🆕 Trigger image refresh
+      toast.success("Profile photo updated!");
+    }
+
     setUploading(false);
-    return;
-  }
-
-  // Get public URL
-  const { data: urlData } = supabase.storage
-    .from("avatars")
-    .getPublicUrl(filePath);
-  const publicUrl = urlData.publicUrl;
-
-  // Save avatar URL in user metadata
-  const { error: updateError } = await supabase.auth.updateUser({
-    data: { avatar_url: publicUrl },
-  });
-
-  if (updateError) {
-    toast.error("Failed to save avatar URL");
-  } else {
-    setAvatarUrl(publicUrl);
-    toast.success("Profile photo updated!");
-  }
-
-  setUploading(false);
-};
-
+  };
 
   const handleSave = async () => {
     const { error } = await supabase.auth.updateUser({
@@ -186,10 +179,13 @@ const handleUpload = async (e) => {
         <div className="avatar-section">
           <img
             src={
-              avatarUrl || "https://via.placeholder.com/150?text=Upload+Photo"
+              avatarUrl
+                ? `${avatarUrl}?t=${cacheBuster}` // 🆕 force refresh
+                : "https://via.placeholder.com/150?text=Upload+Photo"
             }
-            alt=""
-            className="avatar-img" onClick={() => setShowModal(true)} // 🆕 Open modal on click
+            alt="avatar"
+            className="avatar-img"
+            onClick={() => setShowModal(true)}
             style={{ cursor: "pointer" }}
           />
           <label className="upload-btn">
@@ -269,8 +265,8 @@ const handleUpload = async (e) => {
           )}
         </div>
       </div>
-      
-      {/* ✅ Modal for full-size image */}
+
+      {/* Modal for full-size image */}
       {showModal && (
         <div
           className="modal-backdrop"
@@ -289,7 +285,7 @@ const handleUpload = async (e) => {
           }}
         >
           <img
-            src={avatarUrl}
+            src={`${avatarUrl}?t=${cacheBuster}`} // 🆕 refresh in modal too
             alt="Enlarged"
             style={{
               maxWidth: "90vw",

@@ -5,6 +5,7 @@ import { supabase } from "../supabaseClient";
 
 const Header = ({ toggleSidebar }) => {
   const [avatarUrl, setAvatarUrl] = useState("/images/profile.png");
+  const [cacheBuster, setCacheBuster] = useState(Date.now()); // 🆕 used for forcing image refresh
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,6 +20,7 @@ const Header = ({ toggleSidebar }) => {
       const userAvatar = user.user_metadata?.avatar_url;
       if (userAvatar) {
         setAvatarUrl(userAvatar);
+        setCacheBuster(Date.now()); // 🆕 update to force refresh
       }
     };
 
@@ -31,7 +33,11 @@ const Header = ({ toggleSidebar }) => {
       <div className="app-name">EducTrack</div>
       <div className="profile" onClick={() => navigate("/profile")}>
         <img
-          src={avatarUrl || "/images/profile.png"}
+          src={
+            avatarUrl
+              ? `${avatarUrl}?t=${cacheBuster}` // ✅ Add timestamp to force fresh image
+              : "/images/profile.png"
+          }
           alt="Profile"
           className="profile-img"
         />
@@ -41,7 +47,6 @@ const Header = ({ toggleSidebar }) => {
 };
 
 export default Header;
-
 
 
 

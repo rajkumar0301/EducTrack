@@ -29,11 +29,8 @@ const MyProfile = () => {
       if (user) {
         setEmail(user.email);
 
-        const { data: avatarData } = supabase
-          .storage
-          .from("avatars")
-          .getPublicUrl(`public/${user.id}.jpg`);
-        setAvatarUrl(avatarData.publicUrl);
+        setAvatarUrl(user.user_metadata?.avatar_url || "");
+
 
         setName(user.user_metadata?.name || "");
         setMobile(user.user_metadata?.mobile || "");
@@ -57,33 +54,61 @@ const MyProfile = () => {
     fetchUser();
   }, []);
 
-  const handleUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+const handleUpload = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return toast.error("No file selected");
 
-    setUploading(true);
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+  setUploading(true);
 
-    const filePath = `public/${user.id}.jpg`;
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
 
-    const { error } = await supabase.storage
-      .from("avatars")
-      .upload(filePath, file, { upsert: true });
-
-    if (!error) {
-      const { data } = supabase.storage
-        .from("avatars")
-        .getPublicUrl(filePath);
-      setAvatarUrl(data.publicUrl);
-      toast.success("Profile photo updated");
-    } else {
-      toast.error("Upload failed");
-    }
-
+  if (userError || !user) {
+    toast.error("User not found");
     setUploading(false);
-  };
+    return;
+  }
+
+  const fileExt = file.name.split(".").pop();
+  const filePath = `${user.id}.${fileExt}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("avatars")
+    .upload(filePath, file, {
+      upsert: true,
+      contentType: file.type,
+    });
+
+  if (uploadError) {
+    toast.error("Upload failed");
+    console.error(uploadError.message);
+    setUploading(false);
+    return;
+  }
+
+  // Get public URL
+  const { data: urlData } = supabase.storage
+    .from("avatars")
+    .getPublicUrl(filePath);
+  const publicUrl = urlData.publicUrl;
+
+  // Save avatar URL in user metadata
+  const { error: updateError } = await supabase.auth.updateUser({
+    data: { avatar_url: publicUrl },
+  });
+
+  if (updateError) {
+    toast.error("Failed to save avatar URL");
+  } else {
+    setAvatarUrl(publicUrl);
+    toast.success("Profile photo updated!");
+  }
+
+  setUploading(false);
+};
+
 
   const handleSave = async () => {
     const { error } = await supabase.auth.updateUser({

@@ -17,6 +17,8 @@ const MyProfile = () => {
   const [school, setSchool] = useState("");
   const [year, setYear] = useState("");
   const [educationList, setEducationList] = useState([]);
+   const [showModal, setShowModal] = useState(false);
+  
 
   // Fetch user info
   useEffect(() => {
@@ -187,7 +189,8 @@ const handleUpload = async (e) => {
               avatarUrl || "https://via.placeholder.com/150?text=Upload+Photo"
             }
             alt=""
-            className="avatar-img"
+            className="avatar-img" onClick={() => setShowModal(true)} // 🆕 Open modal on click
+            style={{ cursor: "pointer" }}
           />
           <label className="upload-btn">
             {uploading ? "Uploading..." : "Change Photo"}
@@ -266,6 +269,37 @@ const handleUpload = async (e) => {
           )}
         </div>
       </div>
+      
+      {/* ✅ Modal for full-size image */}
+      {showModal && (
+        <div
+          className="modal-backdrop"
+          onClick={() => setShowModal(false)}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0,0,0,0.7)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+          }}
+        >
+          <img
+            src={avatarUrl}
+            alt="Enlarged"
+            style={{
+              maxWidth: "90vw",
+              maxHeight: "80vh",
+              borderRadius: "10px",
+              boxShadow: "0 4px 20px rgba(255,255,255,0.4)",
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 };

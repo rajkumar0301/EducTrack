@@ -4,6 +4,13 @@ import { supabase } from "../supabaseClient";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import * as XLSX from "xlsx";
+import {
+  AiOutlinePlus,
+  AiOutlineDelete,
+  AiOutlineFilePdf,
+} from "react-icons/ai";
+import { BsFileEarmarkSpreadsheet } from "react-icons/bs";
+
 import "../styles/Classes.css";
 
 const Classes = () => {
@@ -106,7 +113,11 @@ const Classes = () => {
           value={schedule}
           onChange={(e) => setSchedule(e.target.value)}
         />
-        <button onClick={handleAdd}>Add Class</button>
+        <button onClick={handleAdd}>
+  <AiOutlinePlus style={{ marginRight: 6 }} />
+  Add Class
+</button>
+
       </div>
 
       <div className="search-export">
@@ -116,8 +127,16 @@ const Classes = () => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <button onClick={handleExportPDF}>📄 Export PDF</button>
-        <button onClick={handleExportExcel}>📊 Export Excel</button>
+        <button onClick={handleExportPDF}>
+  <AiOutlineFilePdf style={{ marginRight: 6 }} />
+  Export PDF
+</button>
+
+<button onClick={handleExportExcel}>
+  <BsFileEarmarkSpreadsheet style={{ marginRight: 6 }} />
+  Export Excel
+</button>
+
       </div>
 
       <table className="classes-table">
@@ -138,9 +157,10 @@ const Classes = () => {
               <td>{c.teacher}</td>
               <td>{c.schedule}</td>
               <td>
-                <button className="delete-btn" onClick={() => handleDelete(c.id)}>
-                  Delete
-                </button>
+               <button className="delete-btn" onClick={() => handleDelete(c.id)}>
+  <AiOutlineDelete />
+</button>
+
               </td>
             </tr>
           ))}

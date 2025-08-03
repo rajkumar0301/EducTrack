@@ -1,219 +1,190 @@
-.cgpa-container {
-  max-width: 1000px;
+/* .cgpa-container {
+  max-width: 600px;
   margin: auto;
-  padding: 2rem;
+  padding: 1.5rem;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   font-family: "Segoe UI", sans-serif;
-}
+} */
 
-h2 {
-  margin-bottom: 1.5rem;
-  color: #1f2937;
-  font-size: 2rem;
+.cgpa-container h2 {
   text-align: center;
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
 }
 
 .semester-block {
-  margin-bottom: 2.5rem;
-  background: #f9fafb;
-  padding: 1.5rem;
+  background: #f9f9f9;
+  padding: 1rem;
   border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+  margin-bottom: 1.2rem;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
 }
 
 .semester-block h3 {
-  margin-bottom: 1rem;
-  font-size: 1.2rem;
-  color: #374151;
-  border-bottom: 1px solid #d1d5db;
-  padding-bottom: 0.5rem;
+  text-align: center;
+  margin-bottom: 0.8rem;
+  color: #333;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 6px;
 }
 
 .subject-table {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
-.table-head,
+.table-head {
+  display: flex;
+  font-weight: bold;
+  justify-content: space-between;
+  padding: 0 0.4rem;
+  color: #555;
+}
+
 .subject-row {
-  display: grid;
-  grid-template-columns: 1.8fr 1fr 1fr 40px;
+  display: flex;
   gap: 0.5rem;
   align-items: center;
+  padding: 0.2rem 0;
 }
 
 .subject-row input,
 .subject-row select {
-  padding: 0.45rem 0.6rem;
-  border-radius: 6px;
-  border: 1px solid #d1d5db;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
   font-size: 1rem;
+  background: #f9fafb;
+  width: 100%;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+.subject-row input:focus,
+.subject-row select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
   background: #ffffff;
-  width: 85%;
 }
 
 .subject-row button {
-  background: #e42626;
+  background-color: #f44336;
   color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 1rem;
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
   cursor: pointer;
-  height: 36px;
-  width: 36px;
+  font-weight: bold;
 }
 
 .add-btn,
 .add-sem-btn {
-  margin-top: 1rem;
-  padding: 0.6rem 1.2rem;
-  background: #202021;
+  margin-top: 0.8rem;
+  padding: 0.5rem 1rem;
+  background-color: #000;
   color: white;
-  font-weight: bold;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background 0.3s ease;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .add-btn:hover,
 .add-sem-btn:hover {
-  background: #4338ca;
+  background-color: #333;
 }
 
 .stats-box {
-  margin-top: 2rem;
+  margin: 1.5rem 0;
   display: flex;
-  gap: 1rem;
   flex-wrap: wrap;
-  justify-content: center;
+  gap: 1rem;
+  justify-content: space-between;
 }
 
 .stat {
   background: #eef2ff;
-  padding: 1.2rem;
   border-radius: 10px;
-  flex: 1;
-  min-width: 200px;
+  padding: 1rem;
+  flex: 1 1 30%;
   text-align: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  font-size: 1.1rem;
-  color: #1e293b;
+  font-size: 1rem;
   font-weight: 500;
+  box-shadow: 0 0 5px rgba(0,0,0,0.05);
 }
 
 .stat strong {
-  font-size: 1.3rem;
   display: block;
-  margin-top: 0.3rem;
-  color: #111827;
+  font-size: 1.5rem;
+  margin-top: 0.5rem;
 }
 
 .export-buttons {
   display: flex;
-  gap: 1rem;
-  margin-top: 2rem;
   flex-wrap: wrap;
-  justify-content: center;
+  gap: 0.6rem;
+  justify-content: space-between;
 }
 
 .export-buttons button {
-  background: #3b82f6;
+  flex: 1 1 calc(50% - 0.4rem);
+  background-color: #4f46e5;
   color: white;
   border: none;
-  padding: 0.7rem 1.5rem;
+  padding: 0.6rem 0.8rem;
   border-radius: 8px;
+  font-size: 0.95rem;
   cursor: pointer;
-  font-weight: 600;
-  transition: 0.3s ease;
+  font-weight: 500;
+  transition: background 0.3s ease;
+}
+
+.export-buttons .save-btn {
+  background-color: #10b981;
 }
 
 .export-buttons button:hover {
-  background: #2563eb;
+  background-color: #4338ca;
 }
 
-.save-btn {
-  background: #10b981 !important;
+.export-buttons .save-btn:hover {
+  background-color: #059669;
 }
 
-/* ✅ Mobile View Enhancements */
-@media (max-width: 600px) {
-  .cgpa-container {
-    padding: 1rem;
-  }
-
-  .table-head,
-  .subject-row {
-    grid-template-columns: 1fr 0.9fr 1fr 32px;
-    gap: 0.4rem;
-  }
-
-  .subject-row input,
-  .subject-row select {
-    font-size: 0.85rem;
-    padding: 0.4rem 0.5rem;
-  }
-
-  .subject-row button {
-    font-size: 0.85rem;
-    height: 30px;
-    width: 30px;
-  }
-
-  .stat {
-    font-size: 0.95rem;
-    padding: 1rem;
-  }
-
-  h2 {
-    font-size: 1.6rem;
-  }
-
-  .add-btn,
-  .add-sem-btn {
-    font-size: 0.9rem;
-    padding: 0.5rem 1rem;
-  }
-
-  .export-buttons {
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .export-buttons button {
-    width: 100%;
-    text-align: center;
-    font-size: 0.95rem;
-  }
-}
-.cgpa-history {
+.history-section {
   margin-top: 2rem;
-  background: #f3f4f6;
+}
+
+.history-list {
+  list-style: none;
+  padding: 0;
+}
+
+.history-card {
+  background: #fafafa;
   padding: 1rem;
-  border-radius: 12px;
-}
-
-.cgpa-history h3 {
-  margin-bottom: 1rem;
-  color: #374151;
-}
-
-.history-item {
-  display: flex;
-  justify-content: space-between;
-  background: white;
-  padding: 0.8rem 1rem;
-  margin-bottom: 0.75rem;
   border-radius: 8px;
-  align-items: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-.history-item button {
+.history-card p {
+  margin: 0.4rem 0;
+  font-size: 0.9rem;
+}
+
+.history-card button {
   background: #ef4444;
   color: white;
   border: none;
-  padding: 0.4rem 0.9rem;
+  padding: 0.4rem 0.6rem;
   border-radius: 6px;
+  margin-top: 0.5rem;
   cursor: pointer;
 }
+

@@ -110,7 +110,7 @@ h2 {
 .task-card {
   padding: 1rem;
   border: 1px solid #ccc;
-  border-left: 6px solid #5b21b6;
+  /* border-left: 6px solid #5b21b6; */
   border-radius: 8px;
   background: #f9f9ff;
   transition: 0.3s ease;

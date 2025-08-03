@@ -1,60 +1,141 @@
 .classes-container {
-  max-width: 1000px;
-  margin: auto;
-  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  font-family: "Segoe UI", sans-serif;
+  color: #333;
 }
-.class-form, .search-export {
+
+.classes-container h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.class-form,
+.search-export {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 1rem;
 }
-.class-form input, .search-export input {
-  padding: 10px;
+
+.class-form input,
+.search-export input {
   flex: 1;
-  min-width: 200px;
+  min-width: 180px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
 }
-button {
+
+.class-form button,
+.search-export button {
+  display: flex;
+  align-items: center;
   background-color: #4f46e5;
   color: white;
   border: none;
   padding: 10px 14px;
   border-radius: 6px;
   cursor: pointer;
+  transition: background 0.3s ease;
+  font-size: 1rem;
 }
-.delete-btn {
-  background: crimson;
+
+.class-form button:hover,
+.search-export button:hover {
+  background-color: #4338ca;
 }
+
+.search-export button {
+  background-color: #059669;
+}
+
+.search-export button:hover {
+  background-color: #047857;
+}
+
+.search-export button:nth-child(3) {
+  background-color: #2563eb;
+}
+
+.search-export button:nth-child(3):hover {
+  background-color: #1e40af;
+}
+
 .classes-table {
   width: 100%;
   border-collapse: collapse;
+  margin-top: 1rem;
+  background-color: #f9f9f9;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.05);
 }
-.classes-table th, .classes-table td {
-  border: 1px solid #ccc;
-  padding: 9px;
+
+.classes-table th,
+.classes-table td {
+  padding: 12px;
   text-align: left;
+  border-bottom: 1px solid #ddd;
+  font-size: 1rem;
+  vertical-align: middle;
 }
-@media (max-width: 550px) {
-  .classes-table thead {
-    display: none;
+
+.classes-table th {
+  background-color: #f1f5f9;
+  color: #374151;
+  font-weight: 600;
+}
+
+.classes-table tr:last-child td {
+  border-bottom: none;
+}
+
+.delete-btn {
+  background-color: #ef4444;
+  border: none;
+  padding: 8px;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s;
+}
+
+.delete-btn:hover {
+  background-color: #dc2626;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .class-form,
+  .search-export {
+    flex-direction: column;
+    gap: 8px;
   }
-  .classes-table tr {
-    display: block;
-    margin-bottom: 15px;
-    background: #f9f9f9;
-    border: 1px solid #ddd;
-  }
+
+  .classes-table th,
   .classes-table td {
-    display: block;
-    text-align: right;
-    padding-left: 50%;
-    position: relative;
+    font-size: 0.95rem;
+    padding: 10px;
   }
-  .classes-table td::before {
-    content: attr(data-label);
-    position: absolute;
-    left: 10px;
-    font-weight: bold;
-    text-align: left;
-  }
+}
+
+button svg {
+  vertical-align: middle;
+  font-size: 18px;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #e63946;
 }

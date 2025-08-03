@@ -42,7 +42,7 @@ const Sidebar = ({ showSidebar, setShowSidebar, handleLogout, userEmail }) => {
         <NavLink to="/groups" onClick={handleLinkClick}>👥 Groups</NavLink>
         <NavLink to="/messages" onClick={handleLinkClick}>💬 Messages</NavLink>
         <NavLink to="/CGPAChecker" onClick={handleLinkClick}>🎓 CGPA Checker</NavLink>
-        <NavLink to="/percentage" onClick={handleLinkClick}>📐 Percentage Checker</NavLink>
+        <NavLink to="/PercentageChecker" onClick={handleLinkClick}>📐 Percentage Checker</NavLink>
         <NavLink to="/upload" onClick={handleLinkClick}>📁 Documents</NavLink>
         <NavLink to="/settings" onClick={handleLinkClick}>⚙️ Settings</NavLink>
       </div>

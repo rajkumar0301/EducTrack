@@ -10,10 +10,10 @@ import FileUpload from "./pages/FileUpload";
 import Tasks from "./pages/Tasks";
 import Classes from "./pages/Classes";
 import CGPAChecker from "./pages/CGPAChecker";
+import PercentageChecker from "./pages/PercentageChecker";
 import Messages from "./pages/Messages";
 import Groups from "./pages/Groups";
-import MyProfile from "./pages/MyProfile"; // make sure this is imported
-
+import MyProfile from "./pages/MyProfile"; 
 import { supabase } from "./supabaseClient";
 
 const AppLayout = ({
@@ -23,7 +23,7 @@ const AppLayout = ({
   handleLogout,
   currentUser,  // using full user object now
 }) => {
-  const [selectedGroupId, setSelectedGroupId] = useState(null);
+  const [setSelectedGroupId] = useState(null);
 
   return (
     <>
@@ -47,6 +47,7 @@ const AppLayout = ({
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/classes" element={<Classes />} />
           <Route path="/CGPAChecker" element={<CGPAChecker />} />
+          <Route path="/PercentageChecker" element={<PercentageChecker />} />
           <Route path="/messages" element={<Messages currentUser={currentUser}  groupId={currentUser?.last_selected_group_id}  />} />
           <Route path="/Groups" element={<Groups currentUser={currentUser} onSelectGroup={setSelectedGroupId} />} />
         </Routes>
@@ -118,7 +119,7 @@ const App = () => {
                 currentUser={currentUser}
               />
             ) : (
-              <Navigate to="/login" replace />
+              <Navigate to="/register" replace />
             )
           }
         />

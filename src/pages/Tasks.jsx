@@ -4,7 +4,8 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import "../styles/Tasks.css";
 
-const Task = ({ userId }) => {
+const Task = () => {
+  const [userId, setUserId] = useState(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState("");
@@ -13,20 +14,31 @@ const Task = ({ userId }) => {
   const [statusFilter, setStatusFilter] = useState("All");
 
   useEffect(() => {
-    fetchTasks();
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUserId(user.id);
+        fetchTasks(user.id);
+      }
+    };
+    fetchUser();
   }, []);
 
-  const fetchTasks = async () => {
+  const fetchTasks = async (uid = userId) => {
+    if (!uid) return;
     const { data, error } = await supabase
       .from("tasks")
       .select("*")
-      .eq("user_id", userId)
+      .eq("user_id", uid)
       .order("due_date", { ascending: true });
+
     if (!error) setTasks(data);
+    else console.error("Fetch error:", error.message);
   };
 
   const handleAddTask = async () => {
-    if (!title) return alert("Title required!");
+    if (!title || !userId) return alert("Title and login required!");
+
     const { error } = await supabase.from("tasks").insert([
       {
         user_id: userId,
@@ -36,13 +48,15 @@ const Task = ({ userId }) => {
         status: "Pending",
       },
     ]);
+
     if (!error) {
       setTitle("");
       setDescription("");
       setDueDate("");
       fetchTasks();
     } else {
-      console.error("Insert failed:", error);
+      console.error("Insert failed:", error.message);
+      alert("Insert failed: " + error.message);
     }
   };
 
@@ -59,22 +73,27 @@ const Task = ({ userId }) => {
   const exportToPDF = () => {
     const doc = new jsPDF();
     doc.text("📋 Task List", 14, 15);
+
     const tableData = tasks.map((task) => [
       task.title,
       task.description,
       task.due_date || "N/A",
       task.status,
     ]);
+
     doc.autoTable({
       head: [["Title", "Description", "Due Date", "Status"]],
       body: tableData,
       startY: 20,
     });
+
     doc.save("task-list.pdf");
   };
 
   const filteredTasks = tasks
-    .filter((task) => task.title.toLowerCase().includes(searchTerm))
+    .filter((task) =>
+      task.title.toLowerCase().includes(searchTerm.toLowerCase())
+    )
     .filter((task) => {
       if (statusFilter === "All") return true;
       return task.status === statusFilter;
@@ -100,7 +119,7 @@ const Task = ({ userId }) => {
           value={dueDate}
           onChange={(e) => setDueDate(e.target.value)}
         />
-        <button onClick={handleAddTask}>Add Task</button>
+        <button onClick={handleAddTask}>➕ Add Task</button>
       </div>
 
       <div className="task-toolbar">
@@ -109,7 +128,7 @@ const Task = ({ userId }) => {
           placeholder="🔍 Search by title"
           className="search-input"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value.toLowerCase())}
+          onChange={(e) => setSearchTerm(e.target.value)}
         />
 
         <div className="status-filter">
@@ -176,3 +195,4 @@ const Task = ({ userId }) => {
 };
 
 export default Task;
+

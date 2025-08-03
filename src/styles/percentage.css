@@ -1,0 +1,146 @@
+/* src/styles/percentage.css */
+
+.percentage-container {
+  max-width: 900px;
+  margin: auto;
+  padding: 1rem;
+  font-family: 'Segoe UI', sans-serif;
+  color: #222;
+}
+
+h2, h3 {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.subject-list {
+  margin-top: 1.5rem;
+}
+
+.subject-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  align-items: center;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+}
+
+.subject-row input {
+  flex: 1 1 auto;
+  min-width: 100px;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.subject-row button {
+  flex-shrink: 0;
+  background: #e63946;
+  border: none;
+  color: white;
+  padding: 0.4rem 0.7rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+
+.add-subject-btn,
+.actions button {
+  margin: 1rem 0.5rem 1rem 0;
+  padding: 0.5rem 0.5rem;
+  border: none;
+  background: #457b9d;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.3s ease;
+}
+
+.add-subject-btn:hover,
+.actions button:hover {
+  background: #1d3557;
+}
+
+.percentage-stats {
+  margin-top: 1.5rem;
+  background: #f1faee;
+  padding: 1rem;
+  border-radius: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  gap: 1rem;
+  text-align: center;
+  font-weight: bold;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.history-section {
+  margin-top: 2rem;
+}
+
+.history-list {
+  list-style: none;
+  padding: 0;
+}
+
+.history-card {
+  background: #f8f9fa;
+  border: 1px solid #ddd;
+  padding: 0.8rem 1rem;
+  margin-bottom: 0.75rem;
+  border-radius: 6px;
+}
+
+.history-card button {
+  background: #e63946;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+  cursor: pointer;
+}
+
+/* 🌐 Responsive Breakpoints */
+@media (max-width: 500px) {
+  .subject-row input {
+    flex: 1 1 100%;
+  }
+
+  .percentage-stats {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .actions button {
+    width: 100%;
+  }
+}
+.icon-only {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #e63946;
+  font-size: 20px;
+  padding: 4px;
+}
+
+button svg {
+  vertical-align: middle;
+  font-size: 18px;
+}

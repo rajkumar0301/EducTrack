@@ -3,6 +3,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import * as XLSX from "xlsx";
 import { supabase } from "../supabaseClient";
+
 import "../styles/cgpa.css";
 
 const gradeMap = {

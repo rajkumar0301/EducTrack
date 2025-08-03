@@ -183,7 +183,7 @@ const MyProfile = () => {
                 ? `${avatarUrl}?t=${cacheBuster}` // 🆕 force refresh
                 : "https://via.placeholder.com/150?text=Upload+Photo"
             }
-            alt="avatar"
+            alt=""
             className="avatar-img"
             onClick={() => setShowModal(true)}
             style={{ cursor: "pointer" }}

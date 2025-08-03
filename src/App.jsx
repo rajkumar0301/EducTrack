@@ -13,7 +13,8 @@ import CGPAChecker from "./pages/CGPAChecker";
 import PercentageChecker from "./pages/PercentageChecker";
 import Messages from "./pages/Messages";
 import Groups from "./pages/Groups";
-import MyProfile from "./pages/MyProfile"; 
+import MyProfile from "./pages/MyProfile";
+import Settings from "./pages/Settings"; 
 import { supabase } from "./supabaseClient";
 
 const AppLayout = ({
@@ -24,6 +25,11 @@ const AppLayout = ({
   currentUser,  // using full user object now
 }) => {
   const [setSelectedGroupId] = useState(null);
+  useEffect(() => {
+  const theme = localStorage.getItem("theme");
+  if (theme) document.documentElement.setAttribute("data-theme", theme);
+}, []);
+
 
   return (
     <>
@@ -44,6 +50,7 @@ const AppLayout = ({
           <Route path="/profile" element={<MyProfile />} />
           <Route path="/" element={<Dashboard userEmail={currentUser.email} />} />
           <Route path="/upload" element={<FileUpload />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/classes" element={<Classes />} />
           <Route path="/CGPAChecker" element={<CGPAChecker />} />

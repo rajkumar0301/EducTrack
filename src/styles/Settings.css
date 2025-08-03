@@ -1,0 +1,181 @@
+:root {
+  --bg: #ffffff;
+  --text: #111111;
+  --card-bg: #f9f9f9;
+  --border: #dddddd;
+  --btn: #4caf50;
+  --btn-hover: #45a049;
+  --danger: #e53935;
+  --primary: #2196f3;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+  --bg: #121212;
+  --text: #f5f5f5;
+  --card-bg: #1e1e1e;
+  --border: #333333;
+  --btn: #2e7d32;
+  --btn-hover: #1b5e20;
+  --danger: #cf2e2e;
+  --primary: #1976d2;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Wrapper and Layout */
+.settings-wrapper {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+}
+
+.settings-title {
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+}
+
+/* Card */
+.settings-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  padding: 1rem 1.2rem;
+  margin-bottom: 2rem;
+  transition: background-color 0.3s ease;
+}
+
+.settings-card h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 1rem;
+  color: var(--text);
+}
+
+/* Input Fields */
+.settings-card input[type="text"],
+.settings-card input[type="password"],
+.settings-card input[type="email"],
+.settings-card input[type="file"] {
+  width: 100%;
+  padding: 10px;
+  margin-top: 6px;
+  margin-bottom: 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background-color: var(--bg);
+  color: var(--text);
+  font-size: 0.95rem;
+  transition: border-color 0.3s;
+}
+
+.settings-card input:focus {
+  border-color: var(--primary);
+  outline: none;
+}
+
+/* Buttons */
+.settings-card button {
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 500;
+  background-color: var(--btn);
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.settings-card button:hover {
+  background-color: var(--btn-hover);
+}
+
+.save-btn {
+  width: 100%;
+  padding: 12px;
+  font-weight: bold;
+  margin-top: 1rem;
+}
+
+/* Avatar Preview */
+.avatar-preview {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-top: 10px;
+  border: 2px solid var(--border);
+}
+
+/* Toggle Theme */
+.toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1rem;
+}
+
+/* Danger Zone */
+/* .danger-zone {
+  border-left: 4px solid var(--danger);
+} */
+
+.logout-btn {
+  width: 100%;
+  margin-top: 10px;
+  background-color: var(--primary);
+}
+
+.logout-btn:hover {
+  background-color: #1565c0;
+}
+
+.delete-btn {
+  width: 100%;
+  margin-top: 10px;
+  background-color: var(--danger);
+}
+
+.delete-btn:hover {
+  background-color: #c62828;
+}
+
+/* Icon Styling */
+.icon {
+  width: 22px;
+  height: 22px;
+  vertical-align: middle;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .settings-wrapper {
+    padding: 1rem;
+  }
+
+  .settings-title {
+    font-size: 1.4rem;
+  }
+
+  .settings-card h3 {
+    font-size: 1rem;
+  }
+
+  .settings-card button,
+  .logout-btn,
+  .delete-btn {
+    font-size: 0.95rem;
+  }
+}

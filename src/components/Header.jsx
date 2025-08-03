@@ -38,7 +38,7 @@ const Header = ({ toggleSidebar }) => {
               ? `${avatarUrl}?t=${cacheBuster}` // ✅ Add timestamp to force fresh image
               : "/images/profile.png"
           }
-          alt="Profile"
+          alt=""
           className="profile-img"
         />
       </div>

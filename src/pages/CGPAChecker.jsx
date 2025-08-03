@@ -3,31 +3,29 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import * as XLSX from "xlsx";
 import { supabase } from "../supabaseClient";
-
 import "../styles/cgpa.css";
 
 const gradeMap = {
-  "O": 10,
+  O: 10,
   "A+": 9,
-  "A": 8,
+  A: 8,
   "A-": 7.5,
   "B+": 7,
-  "B": 6,
+  B: 6,
   "B-": 5.5,
-  "C": 5,
+  C: 5,
   "C-": 4.5,
-  "D": 4,
-  "F": 0,
+  D: 4,
+  F: 0,
 };
 
 const CGPAChecker = () => {
   const [semesters, setSemesters] = useState([
-    {
-      subjects: [{ name: "", credits: "", grade: "" }],
-    },
+    { subjects: [{ name: "", credits: "", grade: "" }] },
   ]);
   const [history, setHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
 
   const handleSubjectChange = (semIndex, subIndex, field, value) => {
     const updated = [...semesters];
@@ -48,7 +46,10 @@ const CGPAChecker = () => {
   };
 
   const addSemester = () => {
-    setSemesters([...semesters, { subjects: [{ name: "", credits: "", grade: "" }] }]);
+    setSemesters([
+      ...semesters,
+      { subjects: [{ name: "", credits: "", grade: "" }] },
+    ]);
   };
 
   const calculateStats = () => {
@@ -66,7 +67,8 @@ const CGPAChecker = () => {
       })
     );
 
-    const cgpa = totalCredits > 0 ? (totalPoints / totalCredits).toFixed(2) : 0;
+    const cgpa =
+      totalCredits > 0 ? (totalPoints / totalCredits).toFixed(2) : 0;
     const percentage = (cgpa * 9.5).toFixed(2);
 
     return { cgpa, percentage, totalCredits };
@@ -77,7 +79,11 @@ const CGPAChecker = () => {
     doc.text("CGPA Report", 14, 16);
 
     semesters.forEach((sem, i) => {
-      const rows = sem.subjects.map((sub) => [sub.name, sub.credits, sub.grade]);
+      const rows = sem.subjects.map((sub) => [
+        sub.name,
+        sub.credits,
+        sub.grade,
+      ]);
       doc.autoTable({
         head: [["Subject", "Credits", "Grade"]],
         body: rows,
@@ -133,7 +139,8 @@ const CGPAChecker = () => {
       alert("❌ Failed to save: " + error.message);
     } else {
       alert("✅ CGPA data saved successfully!");
-      fetchHistory(); // reload
+      fetchHistory();
+      setSemesters([{ subjects: [{ name: "", credits: "", grade: "" }] }]);
     }
   };
 
@@ -151,17 +158,26 @@ const CGPAChecker = () => {
   };
 
   const deleteRecord = async (id) => {
-    const confirm = window.confirm("Are you sure to delete this record?");
-    if (!confirm) return;
+  const confirm = window.confirm("Are you sure to delete this record?");
+  if (!confirm) return;
 
-    const { error } = await supabase.from("cgpa_records").delete().eq("id", id);
-    if (error) {
-      alert("❌ Failed to delete");
-    } else {
-      alert("✅ Record deleted!");
-      fetchHistory();
-    }
-  };
+  setDeletingId(id);
+
+  const { error } = await supabase
+    .from("cgpa_records") // ✅ correct table name
+    .delete()
+    .eq("id", id);         // ✅ match exactly by 'id'
+
+  if (error) {
+    alert("❌ Failed to delete: " + error.message);
+  } else {
+    alert("✅ Record deleted!");
+    setHistory((prev) => prev.filter((item) => item.id !== id)); // remove locally
+  }
+
+  setDeletingId(null);
+};
+
 
   const toggleHistory = () => {
     setShowHistory(!showHistory);
@@ -172,7 +188,14 @@ const CGPAChecker = () => {
 
   return (
     <div className="cgpa-container">
-      <h2>🎓 CGPA Checker</h2>
+      <h2>
+        <img
+          src="https://img.icons8.com/emoji/24/mortar-board-emoji.png"
+          alt="title"
+          className="icon"
+        />
+        CGPA Checker
+      </h2>
 
       {semesters.map((sem, semIndex) => (
         <div className="semester-block" key={semIndex}>
@@ -220,13 +243,15 @@ const CGPAChecker = () => {
             ))}
           </div>
           <button className="add-btn" onClick={() => addSubject(semIndex)}>
-            ➕ Add Subject
+            <img src="https://img.icons8.com/ios-glyphs/20/plus-math.png" className="icon" alt="plus" />
+            Add Subject
           </button>
         </div>
       ))}
 
       <button className="add-sem-btn" onClick={addSemester}>
-        ➕ Add Semester
+        <img src="https://img.icons8.com/ios-glyphs/20/plus-math.png" className="icon" alt="plus" />
+        Add Semester
       </button>
 
       <div className="stats-box">
@@ -236,10 +261,23 @@ const CGPAChecker = () => {
       </div>
 
       <div className="export-buttons">
-        <button onClick={exportToPDF}>📄 Export PDF</button>
-        <button onClick={exportToExcel}>📊 Export Excel</button>
-        <button className="save-btn" onClick={saveToSupabase}>💾 Save</button>
-        <button onClick={toggleHistory}>📚 View History</button>
+        <button onClick={exportToPDF}>
+          <img src="https://img.icons8.com/color/24/export-pdf.png" className="icon" alt="pdf" />
+          Export PDF
+        </button>
+        <button onClick={exportToExcel}>
+          <img src="https://img.icons8.com/color/24/ms-excel.png" className="icon" alt="excel" />
+          Export Excel
+        </button>
+        <button className="save-btn" onClick={saveToSupabase}>
+          <img src="https://img.icons8.com/fluency/24/save.png" className="icon" alt="save" />
+          Save
+        </button>
+        <button onClick={toggleHistory}>
+         <img src="https://img.icons8.com/fluency/24/opened-folder.png" alt="history" className="icon"/>
+
+          View History
+        </button>
       </div>
 
       {showHistory && (
@@ -252,8 +290,34 @@ const CGPAChecker = () => {
               {history.map((item) => (
                 <li key={item.id} className="history-card">
                   <p><strong>CGPA:</strong> {item.cgpa} | <strong>%:</strong> {item.percentage} | <strong>Credits:</strong> {item.total_credits}</p>
-                  <p><em>{new Date(item.created_at).toLocaleString()}</em></p>
-                  <button onClick={() => deleteRecord(item.id)}>🗑️ Delete</button>
+                  <p>
+                    <em>
+                      {item.created_at
+                        ? new Date(item.created_at).toLocaleString("en-IN", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })
+                        : "No Date"}
+                    </em>
+                  </p>
+                  <button
+                    onClick={() => deleteRecord(item.id)}
+                    disabled={deletingId === item.id}
+                  >
+                    {deletingId === item.id ? "Deleting..." : (
+                      <>
+                        <img
+                          src="https://img.icons8.com/ios-glyphs/20/fa314a/delete.png"
+                          alt="Delete"
+                          className="icon"
+                        />
+                        Delete
+                      </>
+                    )}
+                  </button>
                 </li>
               ))}
             </ul>
@@ -265,4 +329,3 @@ const CGPAChecker = () => {
 };
 
 export default CGPAChecker;
-

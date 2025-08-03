@@ -70,7 +70,7 @@ body {
 .settings-card input[type="email"],
 .settings-card input[type="file"] {
   width: 100%;
-  padding: 10px;
+  padding: 5px;
   margin-top: 6px;
   margin-bottom: 14px;
   border-radius: 8px;

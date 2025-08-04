@@ -210,7 +210,28 @@
     display: inline-block;
   }
 }
+.send-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #4f46e5;
+  color: white;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
 
+.send-button:hover {
+  background-color: #4338ca;
+}
+
+.send-icon {
+  width: 20px;
+  height: 20px;
+}
 
 
 

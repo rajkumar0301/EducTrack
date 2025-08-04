@@ -160,20 +160,23 @@ const Messages = ({ user }) => {
             </div>
 
             <div className="chat-input">
-              <input
-                type="text"
-                value={newMsg}
-                placeholder="Type a message..."
-                onChange={(e) => setNewMsg(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-              />
-              <img
-                src="https://img.icons8.com/ios-filled/24/filled-sent.png"
-                alt="Send"
-                className="icon send-icon"
-                onClick={sendMessage}
-              />
-            </div>
+  <input
+    type="text"
+    value={newMsg}
+    placeholder="Type a message..."
+    onChange={(e) => setNewMsg(e.target.value)}
+    onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+  />
+  <button className="send-button" onClick={sendMessage}>
+    <img
+      src="https://img.icons8.com/ios-filled/24/ffffff/sent.png"
+      alt="Send"
+      className="send-icon"
+    />
+    <span>Send</span>
+  </button>
+</div>
+
           </>
         ) : (
           <div className="chat-placeholder">Select a user to start chatting</div>

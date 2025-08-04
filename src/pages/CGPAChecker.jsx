@@ -189,13 +189,9 @@ const CGPAChecker = () => {
   return (
     <div className="cgpa-container">
       <h2>
-        <img
-          src="https://img.icons8.com/emoji/24/mortar-board-emoji.png"
-          alt="title"
-          className="icon"
-        />
-        CGPA Checker
+       <img src="https://img.icons8.com/color/48/graduation-cap.png" alt="Graduation Cap" className="icon"  title="CGPA" /> CGPA Checker
       </h2>
+
 
       {semesters.map((sem, semIndex) => (
         <div className="semester-block" key={semIndex}>

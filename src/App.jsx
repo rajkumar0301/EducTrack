@@ -1,8 +1,8 @@
+// src/App.jsx
 import { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
-
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
@@ -12,18 +12,14 @@ import Classes from "./pages/Classes";
 import CGPAChecker from "./pages/CGPAChecker";
 import PercentageChecker from "./pages/PercentageChecker";
 import Messages from "./pages/Messages";
-import Groups from "./pages/Groups";
+import Attendance from "./pages/Attendance";
+// import Groups from "./pages/Groups";
 import MyProfile from "./pages/MyProfile";
 import Settings from "./pages/Settings"; 
 import { supabase } from "./supabaseClient";
+import { UserProvider } from "./contexts/UserContext";
 
-const AppLayout = ({
-  toggleSidebar,
-  showSidebar,
-  setShowSidebar,
-  handleLogout,
-  currentUser,
-}) => {
+const AppLayout = ({ toggleSidebar, showSidebar, setShowSidebar, handleLogout, currentUser }) => {
   const [setSelectedGroupId] = useState(null);
 
   useEffect(() => {
@@ -54,15 +50,10 @@ const AppLayout = ({
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/classes" element={<Classes />} />
           <Route path="/CGPAChecker" element={<CGPAChecker />} />
+          <Route path="/Attendance" element={<Attendance />} />
           <Route path="/PercentageChecker" element={<PercentageChecker />} />
-
-          {/* ✅ Pass correct user */}
           <Route path="/Messages" element={<Messages user={currentUser} />} />
-
-          <Route
-            path="/Groups"
-            element={<Groups currentUser={currentUser} onSelectGroup={setSelectedGroupId} />}
-          />
+          {/* <Route path="/Groups" element={<Groups />} /> */}
         </Routes>
       </main>
     </>
@@ -111,29 +102,31 @@ const App = () => {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/login" element={currentUser ? <Navigate to="/" /> : <Login />} />
-        <Route path="/register" element={currentUser ? <Navigate to="/" /> : <Register />} />
+    <UserProvider>
+      <Router>
+        <Routes>
+          <Route path="/login" element={currentUser ? <Navigate to="/" /> : <Login />} />
+          <Route path="/register" element={currentUser ? <Navigate to="/" /> : <Register />} />
 
-        <Route
-          path="/*"
-          element={
-            currentUser ? (
-              <AppLayout
-                toggleSidebar={toggleSidebar}
-                showSidebar={showSidebar}
-                setShowSidebar={setShowSidebar}
-                handleLogout={handleLogout}
-                currentUser={currentUser}
-              />
-            ) : (
-              <Navigate to="/register" replace />
-            )
-          }
-        />
-      </Routes>
-    </Router>
+          <Route
+            path="/*"
+            element={
+              currentUser ? (
+                <AppLayout
+                  toggleSidebar={toggleSidebar}
+                  showSidebar={showSidebar}
+                  setShowSidebar={setShowSidebar}
+                  handleLogout={handleLogout}
+                  currentUser={currentUser}
+                />
+              ) : (
+                <Navigate to="/register" replace />
+              )
+            }
+          />
+        </Routes>
+      </Router>
+    </UserProvider>
   );
 };
 
@@ -143,40 +136,38 @@ export default App;
 
 
 
-
-
-
-
-
-
-
-
-
 // import { useEffect, useState } from "react";
 // import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 // import Header from "./components/Header";
 // import Sidebar from "./components/Sidebar";
-// import MyProfile from "./pages/MyProfile";
-// // import Home from "./pages/Home";
 // import Login from "./pages/Login";
 // import Register from "./pages/Register";
 // import Dashboard from "./pages/Dashboard";
-// import { supabase } from "./supabaseClient";
 // import FileUpload from "./pages/FileUpload";
 // import Tasks from "./pages/Tasks";
 // import Classes from "./pages/Classes";
 // import CGPAChecker from "./pages/CGPAChecker";
+// import PercentageChecker from "./pages/PercentageChecker";
 // import Messages from "./pages/Messages";
 // import Groups from "./pages/Groups";
-
+// import MyProfile from "./pages/MyProfile";
+// import Settings from "./pages/Settings"; 
+// import { supabase } from "./supabaseClient";
 
 // const AppLayout = ({
 //   toggleSidebar,
 //   showSidebar,
 //   setShowSidebar,
 //   handleLogout,
-//   userEmail,
+//   currentUser,
 // }) => {
+//   const [setSelectedGroupId] = useState(null);
+
+//   useEffect(() => {
+//     const theme = localStorage.getItem("theme");
+//     if (theme) document.documentElement.setAttribute("data-theme", theme);
+//   }, []);
+
 //   return (
 //     <>
 //       <Header toggleSidebar={toggleSidebar} />
@@ -184,7 +175,7 @@ export default App;
 //         showSidebar={showSidebar}
 //         setShowSidebar={setShowSidebar}
 //         handleLogout={handleLogout}
-//         userEmail={userEmail}
+//         userEmail={currentUser.email}
 //       />
 
 //       {showSidebar && window.innerWidth < 768 && (
@@ -193,17 +184,22 @@ export default App;
 
 //       <main className="main-content">
 //         <Routes>
-//           {/* <Route path="/" element={<Home />} /> */}
 //           <Route path="/profile" element={<MyProfile />} />
-//           <Route path="/" element={<Dashboard userEmail={userEmail} />} />
+//           <Route path="/" element={<Dashboard userEmail={currentUser.email} />} />
 //           <Route path="/upload" element={<FileUpload />} />
+//           <Route path="/settings" element={<Settings />} />
 //           <Route path="/tasks" element={<Tasks />} />
 //           <Route path="/classes" element={<Classes />} />
 //           <Route path="/CGPAChecker" element={<CGPAChecker />} />
-//           <Route path="/Messages" element={<Messages />} />
-//           <Route path="/Groups" element={<Groups />} />
-          
+//           <Route path="/PercentageChecker" element={<PercentageChecker />} />
 
+//           {/* ✅ Pass correct user */}
+//           <Route path="/Messages" element={<Messages user={currentUser} />} />
+
+//           <Route
+//             path="/Groups"
+//             element={<Groups currentUser={currentUser} onSelectGroup={setSelectedGroupId} />}
+//           />
 //         </Routes>
 //       </main>
 //     </>
@@ -212,14 +208,14 @@ export default App;
 
 // const App = () => {
 //   const [showSidebar, setShowSidebar] = useState(false);
-//   const [userEmail, setUserEmail] = useState(null);
+//   const [currentUser, setCurrentUser] = useState(null);
 //   const [loading, setLoading] = useState(true);
 
 //   const toggleSidebar = () => setShowSidebar(!showSidebar);
 
 //   const handleLogout = async () => {
 //     await supabase.auth.signOut();
-//     setUserEmail(null);
+//     setCurrentUser(null);
 //     window.location.href = "/login";
 //   };
 
@@ -227,23 +223,25 @@ export default App;
 //     const getUser = async () => {
 //       const { data: { user } } = await supabase.auth.getUser();
 //       if (user) {
-//         setUserEmail(user.email);
-//       } else {
-//         setUserEmail(null);
+//         const { data: profile } = await supabase
+//           .from("profiles")
+//           .select("name, avatar_url, last_selected_group_id")
+//           .eq("id", user.id)
+//           .single();
+
+//         setCurrentUser({ ...user, ...profile });
 //       }
 //       setLoading(false);
 //     };
-//      // Supabase auth state change listener
-//      const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
-//     if (session?.user?.email) {
-//       setUserEmail(session.user.email);
-//     } else {
-//       setUserEmail(null);
-//     }
-//   });
+
+//     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+//       setCurrentUser(session?.user || null);
+//     });
+
 //     getUser();
+
 //     return () => {
-//     listener?.subscription?.unsubscribe();
+//       listener?.subscription?.unsubscribe();
 //     };
 //   }, []);
 
@@ -252,24 +250,22 @@ export default App;
 //   return (
 //     <Router>
 //       <Routes>
-//         {/* Public Routes */}
-//         <Route path="/login" element={userEmail ? <Navigate to="/" /> : <Login />} />
-//         <Route path="/register" element={userEmail ? <Navigate to="/" /> : <Register />} />
+//         <Route path="/login" element={currentUser ? <Navigate to="/" /> : <Login />} />
+//         <Route path="/register" element={currentUser ? <Navigate to="/" /> : <Register />} />
 
-//         {/* Protected Routes */}
 //         <Route
 //           path="/*"
 //           element={
-//             userEmail ? (
+//             currentUser ? (
 //               <AppLayout
 //                 toggleSidebar={toggleSidebar}
 //                 showSidebar={showSidebar}
 //                 setShowSidebar={setShowSidebar}
 //                 handleLogout={handleLogout}
-//                 userEmail={userEmail}
+//                 currentUser={currentUser}
 //               />
 //             ) : (
-//               <Navigate to="/login" replace />
+//               <Navigate to="/register" replace />
 //             )
 //           }
 //         />

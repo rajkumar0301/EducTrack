@@ -1,63 +1,220 @@
-.groups-container {
+.groups-page {
   padding: 20px;
-  max-width: 600px;
+  max-width: 1200px;
   margin: auto;
+  font-family: 'Segoe UI', sans-serif;
+  color: #222;
+}
+
+h2, h3 {
+  color: #333;
+}
+
+/* Create group form */
+.create-group-form {
+  background: linear-gradient(to right, #f0f0ff, #e5e5ff);
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.create-group-form input,
+.create-group-form textarea {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.create-group-form button {
+  align-self: flex-start;
+  padding: 10px 16px;
+  border: none;
+  background: #6a5acd;
+  color: white;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.create-group-form button:hover {
+  background: #5b4cc4;
+}
+
+/* Group sections */
+.group-section {
+  margin-bottom: 40px;
 }
 
 .group-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+/* Group cards */
+.group-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.1);
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 10px;
+  position: relative;
 }
 
-.group-card {
-  background: #f1f1f1;
-  padding: 15px;
-  border-radius: 10px;
+.group-card img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.group-card h4 {
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+.group-card p {
+  font-size: 0.95rem;
+  color: #555;
+}
+
+/* Buttons in group card */
+.group-buttons {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
 }
 
-.group-actions button {
-  margin-left: 10px;
-  padding: 5px 10px;
+.group-buttons button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: white;
+  background: #6c63ff;
+  transition: all 0.2s ease;
+}
+
+.group-buttons button:hover {
+  background: #5548e5;
+}
+
+.group-buttons button:nth-child(3) {
+  background: #ff4757;
+}
+.group-buttons button:nth-child(4) {
+  background: #d63031;
+}
+
+/* Search bar */
+.search-bar {
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 20px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #aaa;
+}
+
+/* Chat modal */
+.chat-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 90%;
+  max-width: 500px;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  padding: 20px;
+  z-index: 999;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.25);
+}
+
+.chat-messages {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 12px;
+  padding-right: 5px;
+}
+
+.chat-msg {
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+.chat-input {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.chat-input button {
+  padding: 10px 12px;
+  border: none;
+  border-radius: 8px;
+  background: #6c63ff;
+  color: white;
   cursor: pointer;
 }
 
-.leave {
-  background-color: #ffdddd;
-}
+/* Responsive tweaks */
+@media screen and (max-width: 600px) {
+  .group-buttons {
+    flex-direction: column;
+    gap: 6px;
+  }
 
-.create-btn {
-  margin-bottom: 15px;
-  background: #4caf50;
+  .group-card {
+    padding: 14px;
+  }
+
+  .chat-modal {
+    max-width: 90%;
+  }
+}
+.fab {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #6c63ff;
   color: white;
   border: none;
-  padding: 8px 12px;
-  border-radius: 5px;
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  font-size: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  z-index: 1000;
+  transition: background 0.3s ease;
 }
 
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.fab:hover {
+  background: #5548e5;
 }
 
-.modal-content {
-  background: white;
-  padding: 25px;
-  border-radius: 10px;
-  text-align: center;
-  width: 300px;
+.typing-status {
+  font-size: 0.85rem;
+  color: #888;
+  margin: 4px 0 10px;
+  font-style: italic;
 }
 
-.modal-buttons button {
-  margin: 10px 5px;
-}

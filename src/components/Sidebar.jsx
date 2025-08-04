@@ -53,14 +53,28 @@ const Sidebar = ({ showSidebar, setShowSidebar, handleLogout, userEmail }) => {
           <img src="https://img.icons8.com/color/48/todo-list.png" alt="Tasks" style={iconStyle} />
           Tasks
         </NavLink>
-        <NavLink to="/groups" onClick={handleLinkClick}>
+        {/* <NavLink to="/groups" onClick={handleLinkClick}>
           <img src="https://img.icons8.com/color/48/conference-call.png" alt="Groups" style={iconStyle} />
           Groups
-        </NavLink>
+        </NavLink> */}
         <NavLink to="/messages" onClick={handleLinkClick}>
           <img src="https://img.icons8.com/color/48/speech-bubble.png" alt="Messages" style={iconStyle} />
           Messages
         </NavLink>
+        <NavLink to="/attendance" onClick={handleLinkClick}>
+  <img
+    src="https://img.icons8.com/ios-filled/50/attendance-mark.png"
+    alt="Attendance"
+    style={iconStyle}
+    onError={(e) => {
+      e.target.onerror = null;
+      e.target.src = "https://img.icons8.com/ios-filled/50/classroom.png";
+    }}
+  />
+  Attendance
+</NavLink>
+
+
         <NavLink to="/CGPAChecker" onClick={handleLinkClick}>
           <img src="https://img.icons8.com/color/48/report-card.png" alt="CGPA Checker" style={iconStyle} />
           CGPA Checker

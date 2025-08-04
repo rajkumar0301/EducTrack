@@ -1,7 +1,7 @@
 // src/pages/Messages.jsx
 import { useEffect, useState, useRef } from "react";
 import { supabase } from "../supabaseClient";
-import "../styles/Messages";
+import "../styles/Messages.css";
 
 const Messages = ({ user }) => {
   const [users, setUsers] = useState([]);

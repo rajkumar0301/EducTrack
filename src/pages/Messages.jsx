@@ -1,64 +1,55 @@
-import React, { useState, useEffect, useRef } from "react";
+// src/pages/Messages.jsx
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "../supabaseClient";
-import "../styles/messages.css";
+import "../styles/Messages.css";
 
-const Messages = ({ currentUser, groupId }) => {
+const Messages = ({ user }) => {
+  const [users, setUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState("");
-  const [editingId, setEditingId] = useState(null);
-  const [typingUsers, setTypingUsers] = useState([]);
-  const [pinnedOnly, setPinnedOnly] = useState(false);
-  const [members, setMembers] = useState([]);
+  const [newMsg, setNewMsg] = useState("");
+  const chatEndRef = useRef(null);
 
-  const scrollRef = useRef(null);
-
-  // fetchMessages function
-  const fetchMessages = async () => {
-    if (!groupId) return;
-    const { data } = await supabase
-      .from("messages")
-      .select("*")
-      .eq("group_id", groupId)
-      .order("created_at", { ascending: true });
-    setMessages(data || []);
-  };
-
-  // fetchMembers function
-  const fetchMembers = async () => {
-    if (!groupId) return;
-    const { data, error } = await supabase
-      .from("group_members")
-      .select("user_id, profiles(name, avatar_url)")
-      .eq("group_id", groupId);
-    if (data) setMembers(data);
-  };
-
-  // UseEffect to load messages & members + realtime subscription
   useEffect(() => {
-    if (!currentUser?.id || !groupId) return;
+    const fetchUsers = async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("id, name, email, avatar_url")
+        .neq("id", user.id);
+      setUsers(data || []);
+    };
+    fetchUsers();
+  }, [user.id]);
 
+  useEffect(() => {
+    if (!selectedUser) return;
+    const fetchMessages = async () => {
+      const { data } = await supabase
+        .from("messages")
+        .select("*")
+        .or(
+          `and(sender_id.eq.${user.id},receiver_id.eq.${selectedUser.id}),and(sender_id.eq.${selectedUser.id},receiver_id.eq.${user.id})`
+        )
+        .order("created_at", { ascending: true });
+      setMessages(data || []);
+    };
     fetchMessages();
-    fetchMembers();
+  }, [selectedUser, user.id]);
 
+  useEffect(() => {
+    if (!selectedUser) return;
     const channel = supabase
       .channel("realtime:messages")
       .on(
         "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "messages",
-          filter: `group_id=eq.${groupId}`,
-        },
+        { event: "INSERT", schema: "public", table: "messages" },
         (payload) => {
-          if (payload.eventType === "INSERT") {
-            setMessages((prev) => [...prev, payload.new]);
-          } else if (payload.eventType === "UPDATE") {
-            setMessages((prev) =>
-              prev.map((msg) => (msg.id === payload.new.id ? payload.new : msg))
-            );
-          } else if (payload.eventType === "DELETE") {
-            setMessages((prev) => prev.filter((msg) => msg.id !== payload.old.id));
+          const msg = payload.new;
+          const isForThisChat =
+            (msg.sender_id === user.id && msg.receiver_id === selectedUser.id) ||
+            (msg.sender_id === selectedUser.id && msg.receiver_id === user.id);
+          if (isForThisChat) {
+            setMessages((prev) => [...prev, msg]);
           }
         }
       )
@@ -67,191 +58,126 @@ const Messages = ({ currentUser, groupId }) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [currentUser?.id, groupId]);
+  }, [selectedUser, user.id]);
 
-  // Scroll to bottom when messages change
   useEffect(() => {
-    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Typing status subscription
-  useEffect(() => {
-    if (!groupId) return;
-
-    const typingChannel = supabase
-      .channel("typing")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "typing" },
-        async () => {
-          const { data } = await supabase
-            .from("typing")
-            .select("*")
-            .eq("typing", true)
-            .eq("group_id", groupId);
-          setTypingUsers(data ? data.map((u) => u.user_id) : []);
-        }
-      )
-      .subscribe();
-
-    return () => supabase.removeChannel(typingChannel);
-  }, [groupId]);
-
-  // Handle send, edit, delete, reaction, pin functions here (same as before)
-  const handleSend = async () => {
-    if (!input.trim()) return;
-
-    if (editingId) {
-      await supabase.from("messages").update({ content: input }).eq("id", editingId);
-      setEditingId(null);
-    } else {
-      await supabase.from("messages").insert([
-        {
-          user_id: currentUser.id,
-          group_id: groupId,
-          content: input,
-          reactions: {},
-          pinned: false,
-        },
-      ]);
-    }
-    setInput("");
+  const sendMessage = async () => {
+    if (!newMsg.trim()) return;
+    await supabase.from("messages").insert([
+      {
+        sender_id: user.id,
+        receiver_id: selectedUser.id,
+        content: newMsg,
+      },
+    ]);
+    setNewMsg("");
   };
 
-  const handleDelete = async (id) => {
+  const deleteMessage = async (id) => {
     await supabase.from("messages").delete().eq("id", id);
+    setMessages((prev) => prev.filter((msg) => msg.id !== id));
   };
 
-  const handleEdit = (msg) => {
-    setInput(msg.content);
-    setEditingId(msg.id);
+  const getAvatar = (avatar_url, name, email) => {
+    const displayName = name || email?.split("@")[0] || "User";
+    return (
+      avatar_url ||
+      `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random`
+    );
   };
 
-  const handleReaction = async (msgId, emoji) => {
-    const msg = messages.find((m) => m.id === msgId);
-    const reactions = msg?.reactions || {};
-    reactions[emoji] = reactions[emoji] ? reactions[emoji] + 1 : 1;
-    await supabase.from("messages").update({ reactions }).eq("id", msgId);
+  const formatTime = (timestamp) => {
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
-
-  const togglePin = async (msgId, pinned) => {
-    await supabase.from("messages").update({ pinned: !pinned }).eq("id", msgId);
-  };
-
-  const handleTyping = () => {
-    supabase.from("typing").upsert({
-      user_id: currentUser.id,
-      group_id: groupId,
-      typing: true,
-    });
-
-    setTimeout(() => {
-      supabase.from("typing").upsert({
-        user_id: currentUser.id,
-        group_id: groupId,
-        typing: false,
-      });
-    }, 2000);
-  };
-
-  // Conditional rendering for user and group selection
-  if (!currentUser?.id) {
-    return <div className="chat-container">🔒 Please log in to use messages.</div>;
-  }
-
-  if (!groupId) {
-    return <div className="chat-container">ℹ️ Select a group to view messages.</div>;
-  }
-
-  const visibleMessages = pinnedOnly ? messages.filter((msg) => msg.pinned) : messages;
 
   return (
-    <div className="chat-container">
-      <div className="chat-header">
-        <h2>💬 Group Chat</h2>
-        <button onClick={() => setPinnedOnly(!pinnedOnly)}>
-          {pinnedOnly ? "📃 All Messages" : "📌 Pinned Only"}
-        </button>
+    <div className="messages-page">
+      {/* Sidebar */}
+      <div className={`user-list ${selectedUser ? "mobile-hide" : ""}`}>
+        <h3>Contacts</h3>
+        {users.map((u) => (
+          <div
+            key={u.id}
+            className={`user-item ${selectedUser?.id === u.id ? "active" : ""}`}
+            onClick={() => setSelectedUser(u)}
+          >
+            <img
+              src={getAvatar(u.avatar_url, u.name, u.email)}
+              alt={u.name || u.email}
+              className="user-avatar"
+            />
+            <span>{u.name || u.email}</span>
+          </div>
+        ))}
       </div>
 
-      <div className="chat-body">
-        {/* Left: Message List */}
-        <div className="message-panel">
-          <div className="message-list">
-            {visibleMessages.map((msg) => (
-              <div className={`message ${msg.pinned ? "pinned" : ""}`} key={msg.id}>
-                <div className="msg-header">
-                  <span className="msg-user">
-                    <img
-                      src={`https://api.dicebear.com/6.x/thumbs/svg?seed=${msg.user_id}`}
-                      className="avatar"
-                      alt="avatar"
-                    />
-                    {msg.user_id === currentUser.id ? "You" : msg.user_id.slice(0, 6)}
-                  </span>
-                  <span className="msg-time">{new Date(msg.created_at).toLocaleString()}</span>
-                </div>
-                <p>{msg.content}</p>
-                <div className="msg-actions">
-                  {["👍", "❤️", "😄", "😢"].map((emoji) => (
-                    <button key={emoji} onClick={() => handleReaction(msg.id, emoji)}>
-                      {emoji} {msg.reactions?.[emoji] || 0}
-                    </button>
-                  ))}
-
-                  <button onClick={() => togglePin(msg.id, msg.pinned)}>
-                    {msg.pinned ? "📍Unpin" : "📌 Pin"}
-                  </button>
-
-                  {msg.user_id === currentUser.id && (
-                    <>
-                      <button onClick={() => handleEdit(msg)}>✏️ Edit</button>
-                      <button onClick={() => handleDelete(msg.id)}>🗑 Delete</button>
-                    </>
-                  )}
-                </div>
-              </div>
-            ))}
-            <div ref={scrollRef} />
-          </div>
-
-          {typingUsers.length > 0 && (
-            <div className="typing-indicator">
-              {typingUsers.length === 1
-                ? `${typingUsers[0].slice(0, 6)} is typing...`
-                : "Multiple users are typing..."}
-            </div>
-          )}
-
-          <div className="input-area">
-            <input
-              type="text"
-              placeholder="Type a message..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleTyping}
-            />
-            <button onClick={handleSend}>{editingId ? "Update" : "Send"}</button>
-          </div>
-        </div>
-
-        {/* Right: Members Sidebar */}
-        <div className="member-panel">
-          <h4>👥 Group Members</h4>
-          {members.map((m) => (
-            <div key={m.user_id} className="member">
+      {/* Chat */}
+      <div className="chat-area">
+        {selectedUser ? (
+          <>
+            <div className="chat-header">
               <img
-                src={
-                  m.profiles?.avatar_url ||
-                  `https://api.dicebear.com/6.x/thumbs/svg?seed=${m.user_id}`
-                }
-                alt="avatar"
-                className="avatar-small"
+                src="https://img.icons8.com/ios-filled/24/back.png"
+                alt="Back"
+                className="icon back-icon"
+                onClick={() => setSelectedUser(null)}
               />
-              <span>{m.profiles?.name || m.user_id.slice(0, 6)}</span>
+              <img
+                src={getAvatar(
+                  selectedUser.avatar_url,
+                  selectedUser.name,
+                  selectedUser.email
+                )}
+                alt="avatar"
+                className="user-avatar"
+              />
+              <h4>{selectedUser.name || selectedUser.email}</h4>
             </div>
-          ))}
-        </div>
+
+            <div className="chat-messages">
+              {messages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`message ${msg.sender_id === user.id ? "sent" : "received"}`}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    if (msg.sender_id === user.id && window.confirm("Delete this message?")) {
+                      deleteMessage(msg.id);
+                    }
+                  }}
+                >
+                  <div className="bubble">{msg.content}</div>
+                  <div className="timestamp">
+                    {formatTime(msg.created_at)} {msg.sender_id === user.id ? "✅" : ""}
+                  </div>
+                </div>
+              ))}
+              <div ref={chatEndRef}></div>
+            </div>
+
+            <div className="chat-input">
+              <input
+                type="text"
+                value={newMsg}
+                placeholder="Type a message..."
+                onChange={(e) => setNewMsg(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+              />
+              <img
+                src="https://img.icons8.com/ios-filled/24/filled-sent.png"
+                alt="Send"
+                className="icon send-icon"
+                onClick={sendMessage}
+              />
+            </div>
+          </>
+        ) : (
+          <div className="chat-placeholder">Select a user to start chatting</div>
+        )}
       </div>
     </div>
   );
@@ -259,3 +185,170 @@ const Messages = ({ currentUser, groupId }) => {
 
 export default Messages;
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// import { useEffect, useState } from "react";
+// import { supabase } from "../supabaseClient";
+// import "../styles/Messages.css";
+
+// const Messages = ({ user }) => {
+//   const [users, setUsers] = useState([]);
+//   const [selectedUser, setSelectedUser] = useState(null);
+//   const [messages, setMessages] = useState([]);
+//   const [newMsg, setNewMsg] = useState("");
+
+//   useEffect(() => {
+//     const fetchUsers = async () => {
+//       const { data, error } = await supabase
+//         .from("profiles")
+//         .select("id, name, email, avatar_url")
+//         .neq("id", user.id);
+
+//       if (!error) setUsers(data);
+//     };
+
+//     fetchUsers();
+//   }, [user.id]);
+
+//   useEffect(() => {
+//     if (!selectedUser) return;
+
+//     const fetchMessages = async () => {
+//       const { data, error } = await supabase
+//         .from("messages")
+//         .select("*")
+//         .or(
+//           `and(sender_id.eq.${user.id},receiver_id.eq.${selectedUser.id}),and(sender_id.eq.${selectedUser.id},receiver_id.eq.${user.id})`
+//         )
+//         .order("created_at", { ascending: true });
+
+//       if (!error) setMessages(data);
+//     };
+
+//     fetchMessages();
+//   }, [selectedUser, user.id]);
+
+//   useEffect(() => {
+//     if (!selectedUser) return;
+
+//     const channel = supabase
+//       .channel("realtime:messages")
+//       .on(
+//         "postgres_changes",
+//         {
+//           event: "INSERT",
+//           schema: "public",
+//           table: "messages",
+//         },
+//         (payload) => {
+//           const msg = payload.new;
+//           const isRelevant =
+//             (msg.sender_id === user.id && msg.receiver_id === selectedUser.id) ||
+//             (msg.sender_id === selectedUser.id && msg.receiver_id === user.id);
+
+//           if (isRelevant) {
+//             setMessages((prev) => [...prev, msg]);
+//           }
+//         }
+//       )
+//       .subscribe();
+
+//     return () => {
+//       supabase.removeChannel(channel);
+//     };
+//   }, [selectedUser, user.id]);
+
+//   const sendMessage = async () => {
+//     if (!newMsg.trim()) return;
+
+//     const { error } = await supabase.from("messages").insert([
+//       {
+//         sender_id: user.id,
+//         receiver_id: selectedUser.id,
+//         content: newMsg,
+//       },
+//     ]);
+
+//     if (!error) setNewMsg("");
+//   };
+
+//   const getAvatar = (avatar_url, name, email) => {
+//     const displayName = name || email?.split("@")[0] || "User";
+//     return (
+//       avatar_url ||
+//       `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random`
+//     );
+//   };
+
+//   return (
+//     <div className="messages-page">
+//       {/* User List */}
+//       {!selectedUser ? (
+//         <div className="user-list">
+//           <h3>Chats</h3>
+//           {users.map((u) => (
+//             <div
+//               key={u.id}
+//               className="user-item"
+//               onClick={() => setSelectedUser(u)}
+//             >
+//               <img
+//                 src={getAvatar(u.avatar_url, u.name, u.email)}
+//                 alt={u.name || u.email}
+//                 className="user-avatar"
+//               />
+//               <span>{u.name || u.email}</span>
+//             </div>
+//           ))}
+//         </div>
+//       ) : (
+//         // Chat Area
+//         <div className="chat-area">
+//           <div className="chat-header">
+//             <button className="back-button" onClick={() => setSelectedUser(null)}>
+//               ⬅ Back
+//             </button>
+//             <h4>{selectedUser.name || selectedUser.email}</h4>
+//           </div>
+
+//           <div className="chat-messages">
+//             {messages.map((msg) => (
+//               <div
+//                 key={msg.id}
+//                 className={`message ${msg.sender_id === user.id ? "sent" : "received"}`}
+//               >
+//                 {msg.content}
+//               </div>
+//             ))}
+//           </div>
+
+//           <div className="chat-input">
+//             <input
+//               type="text"
+//               value={newMsg}
+//               placeholder="Type a message..."
+//               onChange={(e) => setNewMsg(e.target.value)}
+//               onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+//             />
+//             <button onClick={sendMessage}>Send</button>
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default Messages;

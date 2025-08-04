@@ -103,3 +103,7 @@
     left: 0;
   }
 }
+.sidebar-menu a:hover img,
+.sidebar-bottom button:hover img {
+  transform: scale(1.2);
+}

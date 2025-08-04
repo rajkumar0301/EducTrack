@@ -1,0 +1,31 @@
+/* ✅ ContactList.css */
+.contact-list {
+  padding: 1rem;
+  background: #fff;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.contact-list h3 {
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.contact-item {
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  background: #f0f0f0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.contact-item:hover {
+  background: #e0e0e0;
+}
+
+.contact-item.active {
+  background: #007bff;
+  color: white;
+}

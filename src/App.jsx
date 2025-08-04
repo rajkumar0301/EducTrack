@@ -22,14 +22,14 @@ const AppLayout = ({
   showSidebar,
   setShowSidebar,
   handleLogout,
-  currentUser,  // using full user object now
+  currentUser,
 }) => {
   const [setSelectedGroupId] = useState(null);
-  useEffect(() => {
-  const theme = localStorage.getItem("theme");
-  if (theme) document.documentElement.setAttribute("data-theme", theme);
-}, []);
 
+  useEffect(() => {
+    const theme = localStorage.getItem("theme");
+    if (theme) document.documentElement.setAttribute("data-theme", theme);
+  }, []);
 
   return (
     <>
@@ -55,14 +55,19 @@ const AppLayout = ({
           <Route path="/classes" element={<Classes />} />
           <Route path="/CGPAChecker" element={<CGPAChecker />} />
           <Route path="/PercentageChecker" element={<PercentageChecker />} />
-          <Route path="/messages" element={<Messages currentUser={currentUser}  groupId={currentUser?.last_selected_group_id}  />} />
-          <Route path="/Groups" element={<Groups currentUser={currentUser} onSelectGroup={setSelectedGroupId} />} />
+
+          {/* ✅ Pass correct user */}
+          <Route path="/Messages" element={<Messages user={currentUser} />} />
+
+          <Route
+            path="/Groups"
+            element={<Groups currentUser={currentUser} onSelectGroup={setSelectedGroupId} />}
+          />
         </Routes>
       </main>
     </>
   );
 };
-
 
 const App = () => {
   const [showSidebar, setShowSidebar] = useState(false);
@@ -78,20 +83,19 @@ const App = () => {
   };
 
   useEffect(() => {
-  const getUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("name, avatar_url, last_selected_group_id")
-        .eq("id", user.id)
-        .single();
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("name, avatar_url, last_selected_group_id")
+          .eq("id", user.id)
+          .single();
 
-      setCurrentUser({ ...user, ...profile }); // set full currentUser object
-    }
-    setLoading(false);
-  };
-
+        setCurrentUser({ ...user, ...profile });
+      }
+      setLoading(false);
+    };
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setCurrentUser(session?.user || null);
@@ -109,11 +113,9 @@ const App = () => {
   return (
     <Router>
       <Routes>
-        {/* Public Routes */}
         <Route path="/login" element={currentUser ? <Navigate to="/" /> : <Login />} />
         <Route path="/register" element={currentUser ? <Navigate to="/" /> : <Register />} />
 
-        {/* Protected Routes */}
         <Route
           path="/*"
           element={
@@ -136,6 +138,7 @@ const App = () => {
 };
 
 export default App;
+
 
 
 

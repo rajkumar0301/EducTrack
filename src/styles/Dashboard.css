@@ -93,6 +93,47 @@
   color: #777;
   margin-top: 0.2rem;
 }
+.attendance-details {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  max-width: 500px;
+  width: 100%;
+}
+
+.attendance-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.attendance-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.attendance-list li {
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 16px;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #333;
+}
+.stat-card img {
+  width: 32px;
+  height: 32px;
+  margin-bottom: 8px;
+}
 
 
 

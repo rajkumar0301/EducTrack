@@ -9,11 +9,13 @@ dayjs.extend(relativeTime);
 
 const Dashboard = () => {
   const [loading, setLoading] = useState(true);
-  const [cgpa, setCgpa] = useState(null);
   const [fileCount, setFileCount] = useState(0);
   const [taskCount, setTaskCount] = useState(0);
   const [name, setName] = useState("");
   const [activities, setActivities] = useState([]);
+  const [attendanceData, setAttendanceData] = useState([]);
+  const [overallAttendance, setOverallAttendance] = useState(0);
+  const [showAttendance, setShowAttendance] = useState(false);
 
   const fetchAllData = async () => {
     setLoading(true);
@@ -27,15 +29,40 @@ const Dashboard = () => {
     const userId = user.id;
     setName(user.user_metadata?.name || "User");
 
-    // CGPA
-    const { data: grades } = await supabase
-      .from("grades")
-      .select("gpa, created_at")
+    // Attendance
+    const { data: attendanceRaw } = await supabase
+      .from("attendance")
+      .select("*")
       .eq("user_id", userId);
 
-    if (grades?.length) {
-      const total = grades.reduce((sum, g) => sum + parseFloat(g.gpa), 0);
-      setCgpa((total / grades.length).toFixed(2));
+    if (attendanceRaw?.length) {
+      const subjects = {};
+
+      attendanceRaw.forEach((record) => {
+        const subject = record.subject;
+        const isPresent = record.status?.toLowerCase() === "present";
+
+        if (!subjects[subject]) {
+          subjects[subject] = { present: 0, total: 0 };
+        }
+
+        subjects[subject].total += 1;
+        if (isPresent) subjects[subject].present += 1;
+      });
+
+      const subjectStats = Object.keys(subjects).map((subject) => {
+        const { present, total } = subjects[subject];
+        const percent = ((present / total) * 100).toFixed(1);
+        return { subject, percent };
+      });
+
+      setAttendanceData(subjectStats);
+
+      const totalPresent = attendanceRaw.filter(
+        (r) => r.status?.toLowerCase() === "present"
+      ).length;
+      const totalEntries = attendanceRaw.length;
+      setOverallAttendance(((totalPresent / totalEntries) * 100).toFixed(1));
     }
 
     // File Count
@@ -53,13 +80,22 @@ const Dashboard = () => {
       .eq("completed", true);
     setTaskCount(taskDone || 0);
 
-    // Recent Activity
-    const recentGrades = grades?.slice(0, 2).map((g) => ({
-      type: "GPA Update",
-      message: `Updated GPA: ${g.gpa}`,
-      time: g.created_at,
-    })) || [];
+    // GPA History
+    const { data: gradesData } = await supabase
+      .from("cgpa_records")
+      .select("cgpa, created_at")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(2);
 
+    const recentGrades =
+      gradesData?.map((g) => ({
+        type: "GPA Update",
+        message: `Updated CGPA: ${g.cgpa}`,
+        time: g.created_at,
+      })) || [];
+
+    // File Upload Activity
     const { data: docs } = await supabase
       .from("documents")
       .select("name, created_at")
@@ -67,12 +103,14 @@ const Dashboard = () => {
       .order("created_at", { ascending: false })
       .limit(2);
 
-    const recentDocs = docs?.map((d) => ({
-      type: "File Upload",
-      message: `Uploaded: ${d.name}`,
-      time: d.created_at,
-    })) || [];
+    const recentDocs =
+      docs?.map((d) => ({
+        type: "File Upload",
+        message: `Uploaded: ${d.name}`,
+        time: d.created_at,
+      })) || [];
 
+    // Completed Tasks
     const { data: tasks } = await supabase
       .from("tasks")
       .select("title, created_at")
@@ -81,11 +119,12 @@ const Dashboard = () => {
       .order("created_at", { ascending: false })
       .limit(2);
 
-    const recentTasks = tasks?.map((t) => ({
-      type: "Task Done",
-      message: `Completed task: ${t.title}`,
-      time: t.created_at,
-    })) || [];
+    const recentTasks =
+      tasks?.map((t) => ({
+        type: "Task Done",
+        message: `Completed task: ${t.title}`,
+        time: t.created_at,
+      })) || [];
 
     const all = [...recentGrades, ...recentDocs, ...recentTasks];
     const sorted = all.sort((a, b) => new Date(b.time) - new Date(a.time));
@@ -108,19 +147,56 @@ const Dashboard = () => {
       <h2 className="dashboard-heading">📊 Dashboard</h2>
 
       <div className="stat-boxes">
+        <div className="stat-card" onClick={() => setShowAttendance(true)}>
+  <img
+    src="https://img.icons8.com/color/48/classroom.png"
+    alt="Attendance"
+  />
+  <h3>Attendance</h3>
+  <p>{loading ? "..." : `${overallAttendance || 0}%`}</p>
+</div>
+
         <div className="stat-card">
-          <h3>🎓 CGPA</h3>
-          <p>{loading ? "Loading..." : cgpa || "0.00"}</p>
-        </div>
-        <div className="stat-card">
-          <h3>📂 Files Uploaded</h3>
+          <img
+            src="https://img.icons8.com/color/48/upload-to-cloud.png"
+            alt="Files"
+          />
+          <h3>Files Uploaded</h3>
           <p>{loading ? "..." : fileCount}</p>
         </div>
+
         <div className="stat-card">
-          <h3>✅ Tasks Done</h3>
+          <img
+            src="https://img.icons8.com/fluency/48/checked--v1.png"
+            alt="Tasks Done"
+          />
+          <h3>Tasks Done</h3>
           <p>{loading ? "..." : taskCount}</p>
         </div>
       </div>
+
+      {showAttendance && (
+        <div className="attendance-details">
+          <div className="attendance-header">
+            <h4>📚 Subject-wise Attendance</h4>
+            <button className="close-btn" onClick={() => setShowAttendance(false)}>
+              ❌ Close
+            </button>
+          </div>
+
+          {attendanceData?.length > 0 ? (
+            <ul className="attendance-list">
+              {attendanceData.map((item) => (
+                <li key={item.subject}>
+                  <strong>{item.subject}</strong>: {item.percent}%
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No subject-wise attendance found.</p>
+          )}
+        </div>
+      )}
 
       <div className="activity-section">
         <h3>📌 Recent Activity</h3>
@@ -144,6 +220,8 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
+
 
 
 

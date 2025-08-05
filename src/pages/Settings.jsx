@@ -164,7 +164,8 @@ const Settings = ({ handleLogout }) => {
           Danger Zone
         </h3>
         <button className="delete-btn" onClick={handleDeleteAccount}>Delete Account</button>
-        <button className="logout-btn" onClick={handleLogout}>Logout</button>
+        <button className="logout-btn" onClick={() => handleLogout ? handleLogout() : supabase.auth.signOut().then(() => window.location.href = "/")}> Logout</button>
+
       </div>
     </div>
   );

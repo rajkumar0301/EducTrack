@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { supabase } from "../supabaseClient";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -13,18 +13,8 @@ const Task = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setUserId(user.id);
-        fetchTasks(user.id);
-      }
-    };
-    fetchUser();
-  }, []);
-
-  const fetchTasks = async (uid = userId) => {
+  // ✅ useCallback version of fetchTasks
+  const fetchTasks = useCallback(async (uid = userId) => {
     if (!uid) return;
     const { data, error } = await supabase
       .from("tasks")
@@ -34,20 +24,29 @@ const Task = () => {
 
     if (!error) setTasks(data);
     else console.error("Fetch error:", error.message);
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUserId(user.id);
+        fetchTasks(user.id);
+      }
+    };
+    fetchUser();
+  }, [fetchTasks]); // ✅ fetchTasks is now safe to use in dependency array
 
   const handleAddTask = async () => {
     if (!title || !userId) return alert("Title and login required!");
 
-    const { error } = await supabase.from("tasks").insert([
-      {
-        user_id: userId,
-        title,
-        description,
-        due_date: dueDate,
-        status: "Pending",
-      },
-    ]);
+    const { error } = await supabase.from("tasks").insert([{
+      user_id: userId,
+      title,
+      description,
+      due_date: dueDate,
+      status: "Pending",
+    }]);
 
     if (!error) {
       setTitle("");
@@ -61,8 +60,17 @@ const Task = () => {
   };
 
   const markAsDone = async (id) => {
-    await supabase.from("tasks").update({ status: "Done" }).eq("id", id);
-    fetchTasks();
+    const { error } = await supabase
+      .from("tasks")
+      .update({ status: "Done", completed: true })
+      .eq("id", id);
+
+    if (error) {
+      console.error("❌ Mark as done failed:", error.message);
+      alert("Failed to mark task as done. Check console.");
+    } else {
+      fetchTasks();
+    }
   };
 
   const deleteTask = async (id) => {
@@ -91,13 +99,8 @@ const Task = () => {
   };
 
   const filteredTasks = tasks
-    .filter((task) =>
-      task.title.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .filter((task) => {
-      if (statusFilter === "All") return true;
-      return task.status === statusFilter;
-    });
+    .filter((task) => task.title.toLowerCase().includes(searchTerm.toLowerCase()))
+    .filter((task) => statusFilter === "All" || task.status === statusFilter);
 
   return (
     <div className="task-container">
@@ -132,24 +135,9 @@ const Task = () => {
         />
 
         <div className="status-filter">
-          <button
-            onClick={() => setStatusFilter("All")}
-            className={statusFilter === "All" ? "active" : ""}
-          >
-            🔁 All
-          </button>
-          <button
-            onClick={() => setStatusFilter("Pending")}
-            className={statusFilter === "Pending" ? "active" : ""}
-          >
-            🟡 Pending
-          </button>
-          <button
-            onClick={() => setStatusFilter("Done")}
-            className={statusFilter === "Done" ? "active" : ""}
-          >
-            ✅ Done
-          </button>
+          <button onClick={() => setStatusFilter("All")} className={statusFilter === "All" ? "active" : ""}>🔁 All</button>
+          <button onClick={() => setStatusFilter("Pending")} className={statusFilter === "Pending" ? "active" : ""}>🟡 Pending</button>
+          <button onClick={() => setStatusFilter("Done")} className={statusFilter === "Done" ? "active" : ""}>✅ Done</button>
         </div>
 
         <button onClick={exportToPDF} className="export-btn">
@@ -163,28 +151,18 @@ const Task = () => {
           <p>No matching tasks.</p>
         ) : (
           filteredTasks.map((task) => (
-            <div
-              className={`task-card ${task.status === "Done" ? "done" : ""}`}
-              key={task.id}
-            >
+            <div className={`task-card ${task.status === "Done" ? "done" : ""}`} key={task.id}>
               <h3>{task.title}</h3>
               <p>{task.description}</p>
               <p>📅 Due: {task.due_date || "No due date"}</p>
               <p>
-                Status:{" "}
-                <span className={`status ${task.status.toLowerCase()}`}>
-                  {task.status}
-                </span>
+                Status: <span className={`status ${task.status.toLowerCase()}`}>{task.status}</span>
               </p>
               <div className="task-actions">
                 {task.status !== "Done" && (
-                  <button onClick={() => markAsDone(task.id)}>
-                    ✅ Mark as Done
-                  </button>
+                  <button onClick={() => markAsDone(task.id)}>✅ Mark as Done</button>
                 )}
-                <button className="delete" onClick={() => deleteTask(task.id)}>
-                  🗑 Delete
-                </button>
+                <button className="delete" onClick={() => deleteTask(task.id)}>🗑 Delete</button>
               </div>
             </div>
           ))
@@ -195,4 +173,5 @@ const Task = () => {
 };
 
 export default Task;
+
 

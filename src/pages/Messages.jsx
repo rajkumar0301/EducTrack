@@ -1,4 +1,4 @@
-// src/pages/Messages.jsx
+// ✅ Updated Messages.jsx (WhatsApp-style layout + mobile responsive)
 import { useEffect, useState, useRef } from "react";
 import { supabase } from "../supabaseClient";
 import ContactList from "../components/ContactList";
@@ -14,7 +14,10 @@ const Messages = ({ user }) => {
   const [friends, setFriends] = useState([]);
   const [requestsSent, setRequestsSent] = useState([]);
   const [friendRequests, setFriendRequests] = useState([]);
+  const [showSidebar, setShowSidebar] = useState(true);
   const chatEndRef = useRef(null);
+
+  const isMobile = window.innerWidth <= 768;
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -76,40 +79,6 @@ const Messages = ({ user }) => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const sendMessage = async () => {
-    if (!newMsg.trim()) return;
-    await supabase.from("messages").insert([
-      {
-        sender_id: user.id,
-        receiver_id: selectedUser.id,
-        content: newMsg,
-      },
-    ]);
-    setNewMsg("");
-  };
-
-  const handleTyping = async () => {
-    await supabase.channel("typing-channel").send({
-      type: "broadcast",
-      event: "typing",
-      payload: { sender: user.id, receiver: selectedUser.id },
-    });
-  };
-
-  const getAvatar = (avatar_url, name, email) => {
-    const displayName = name || email?.split("@")[0] || "User";
-    return (
-      avatar_url ||
-      `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random`
-    );
-  };
-
-  const formatTime = (timestamp) => {
-    if (!timestamp) return "";
-    const date = new Date(timestamp);
-    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  };
-
   useEffect(() => {
     const fetchFriendData = async () => {
       const sent = await supabase
@@ -129,9 +98,7 @@ const Messages = ({ user }) => {
         .or(`user1.eq.${user.id},user2.eq.${user.id}`);
 
       const friendIds =
-        accepted.data?.map((f) =>
-          f.user1 === user.id ? f.user2 : f.user1
-        ) || [];
+        accepted.data?.map((f) => (f.user1 === user.id ? f.user2 : f.user1)) || [];
 
       setFriends(friendIds);
 
@@ -147,6 +114,26 @@ const Messages = ({ user }) => {
 
     fetchFriendData();
   }, [user.id]);
+
+  const sendMessage = async () => {
+    if (!newMsg.trim()) return;
+    await supabase.from("messages").insert([
+      {
+        sender_id: user.id,
+        receiver_id: selectedUser.id,
+        content: newMsg,
+      },
+    ]);
+    setNewMsg("");
+  };
+
+  const handleTyping = async () => {
+    await supabase.channel("typing-channel").send({
+      type: "broadcast",
+      event: "typing",
+      payload: { sender: user.id, receiver: selectedUser.id },
+    });
+  };
 
   const handleSendRequest = async (receiverId) => {
     const { error } = await supabase.from("friend_requests").insert([
@@ -182,21 +169,42 @@ const Messages = ({ user }) => {
     setFriendRequests((prev) => prev.filter((r) => r.id !== senderId));
   };
 
-  return (
-    <div className={`messages-page ${selectedUser ? "chat-open" : ""}`}>
-      <ContactList
-        users={users}
-        selectedUser={selectedUser}
-        setSelectedUser={setSelectedUser}
-        onSendRequest={handleSendRequest}
-        onAcceptRequest={handleAcceptRequest}
-        onRejectRequest={handleRejectRequest}
-        friends={friends}
-        requestsSent={requestsSent}
-        friendRequests={friendRequests}
-      />
+  const getAvatar = (avatar_url, name, email) => {
+    const displayName = name || email?.split("@")[0] || "User";
+    return (
+      avatar_url ||
+      `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random`
+    );
+  };
 
-      <div className="chat-area">
+  const formatTime = (timestamp) => {
+    if (!timestamp) return "";
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  };
+
+  const friendsList = users.filter((u) => friends.includes(u.id));
+
+  return (
+    <div className="messages-page">
+      {showSidebar && (
+        <ContactList
+          users={friendsList}
+          selectedUser={selectedUser}
+          setSelectedUser={(user) => {
+            setSelectedUser(user);
+            if (isMobile) setShowSidebar(false);
+          }}
+          onSendRequest={handleSendRequest}
+          onAcceptRequest={handleAcceptRequest}
+          onRejectRequest={handleRejectRequest}
+          friends={friends}
+          requestsSent={requestsSent}
+          friendRequests={friendRequests}
+        />
+      )}
+
+      <div className={`chat-area ${!showSidebar ? "full-width" : ""}`}>
         {selectedUser ? (
           <>
             <div className="chat-header">
@@ -204,7 +212,10 @@ const Messages = ({ user }) => {
                 src="https://img.icons8.com/ios-filled/30/left.png"
                 alt="Back"
                 className="icon back-icon"
-                onClick={() => setSelectedUser(null)}
+                onClick={() => {
+                  setSelectedUser(null);
+                  if (isMobile) setShowSidebar(true);
+                }}
               />
               <img
                 src={getAvatar(

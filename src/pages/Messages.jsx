@@ -1,4 +1,4 @@
-// ✅ Updated Messages.jsx (WhatsApp-style layout + mobile responsive)
+// ✅ src/pages/Messages.jsx
 import { useEffect, useState, useRef } from "react";
 import { supabase } from "../supabaseClient";
 import ContactList from "../components/ContactList";
@@ -14,10 +14,24 @@ const Messages = ({ user }) => {
   const [friends, setFriends] = useState([]);
   const [requestsSent, setRequestsSent] = useState([]);
   const [friendRequests, setFriendRequests] = useState([]);
-  const [showSidebar, setShowSidebar] = useState(true);
   const chatEndRef = useRef(null);
 
-  const isMobile = window.innerWidth <= 768;
+  // Mobile chat toggling
+  const openChat = (user) => {
+    setSelectedUser(user);
+    if (window.innerWidth <= 768) {
+      document.querySelector(".chat-area").classList.add("active");
+      document.querySelector(".contact-list").classList.add("hidden");
+    }
+  };
+
+  const closeChat = () => {
+    setSelectedUser(null);
+    if (window.innerWidth <= 768) {
+      document.querySelector(".chat-area").classList.remove("active");
+      document.querySelector(".contact-list").classList.remove("hidden");
+    }
+  };
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -70,14 +84,46 @@ const Messages = ({ user }) => {
       })
       .subscribe();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => supabase.removeChannel(channel);
   }, [selectedUser, user.id]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  const sendMessage = async () => {
+    if (!newMsg.trim()) return;
+    await supabase.from("messages").insert([
+      {
+        sender_id: user.id,
+        receiver_id: selectedUser.id,
+        content: newMsg,
+      },
+    ]);
+    setNewMsg("");
+  };
+
+  const handleTyping = async () => {
+    await supabase.channel("typing-channel").send({
+      type: "broadcast",
+      event: "typing",
+      payload: { sender: user.id, receiver: selectedUser.id },
+    });
+  };
+
+  const getAvatar = (avatar_url, name, email) => {
+    const displayName = name || email?.split("@")[0] || "User";
+    return (
+      avatar_url ||
+      `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random`
+    );
+  };
+
+  const formatTime = (timestamp) => {
+    if (!timestamp) return "";
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  };
 
   useEffect(() => {
     const fetchFriendData = async () => {
@@ -85,6 +131,7 @@ const Messages = ({ user }) => {
         .from("friend_requests")
         .select("receiver_id")
         .eq("sender_id", user.id);
+
       const received = await supabase
         .from("friend_requests")
         .select("id, sender_id")
@@ -115,30 +162,11 @@ const Messages = ({ user }) => {
     fetchFriendData();
   }, [user.id]);
 
-  const sendMessage = async () => {
-    if (!newMsg.trim()) return;
-    await supabase.from("messages").insert([
-      {
-        sender_id: user.id,
-        receiver_id: selectedUser.id,
-        content: newMsg,
-      },
-    ]);
-    setNewMsg("");
-  };
-
-  const handleTyping = async () => {
-    await supabase.channel("typing-channel").send({
-      type: "broadcast",
-      event: "typing",
-      payload: { sender: user.id, receiver: selectedUser.id },
-    });
-  };
-
   const handleSendRequest = async (receiverId) => {
-    const { error } = await supabase.from("friend_requests").insert([
-      { sender_id: user.id, receiver_id: receiverId },
-    ]);
+    const { error } = await supabase
+      .from("friend_requests")
+      .insert([{ sender_id: user.id, receiver_id: receiverId }]);
+
     if (error) toast.error("Request failed.");
     else {
       toast.success("Friend request sent!");
@@ -147,9 +175,7 @@ const Messages = ({ user }) => {
   };
 
   const handleAcceptRequest = async (senderId) => {
-    await supabase.from("friends").insert([
-      { user1: user.id, user2: senderId },
-    ]);
+    await supabase.from("friends").insert([{ user1: user.id, user2: senderId }]);
     await supabase
       .from("friend_requests")
       .delete()
@@ -169,42 +195,21 @@ const Messages = ({ user }) => {
     setFriendRequests((prev) => prev.filter((r) => r.id !== senderId));
   };
 
-  const getAvatar = (avatar_url, name, email) => {
-    const displayName = name || email?.split("@")[0] || "User";
-    return (
-      avatar_url ||
-      `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random`
-    );
-  };
-
-  const formatTime = (timestamp) => {
-    if (!timestamp) return "";
-    const date = new Date(timestamp);
-    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  };
-
-  const friendsList = users.filter((u) => friends.includes(u.id));
-
   return (
     <div className="messages-page">
-      {showSidebar && (
-        <ContactList
-          users={friendsList}
-          selectedUser={selectedUser}
-          setSelectedUser={(user) => {
-            setSelectedUser(user);
-            if (isMobile) setShowSidebar(false);
-          }}
-          onSendRequest={handleSendRequest}
-          onAcceptRequest={handleAcceptRequest}
-          onRejectRequest={handleRejectRequest}
-          friends={friends}
-          requestsSent={requestsSent}
-          friendRequests={friendRequests}
-        />
-      )}
+      <ContactList
+        users={users}
+        selectedUser={selectedUser}
+        setSelectedUser={openChat}
+        onSendRequest={handleSendRequest}
+        onAcceptRequest={handleAcceptRequest}
+        onRejectRequest={handleRejectRequest}
+        friends={friends}
+        requestsSent={requestsSent}
+        friendRequests={friendRequests}
+      />
 
-      <div className={`chat-area ${!showSidebar ? "full-width" : ""}`}>
+      <div className="chat-area">
         {selectedUser ? (
           <>
             <div className="chat-header">
@@ -212,10 +217,7 @@ const Messages = ({ user }) => {
                 src="https://img.icons8.com/ios-filled/30/left.png"
                 alt="Back"
                 className="icon back-icon"
-                onClick={() => {
-                  setSelectedUser(null);
-                  if (isMobile) setShowSidebar(true);
-                }}
+                onClick={closeChat}
               />
               <img
                 src={getAvatar(

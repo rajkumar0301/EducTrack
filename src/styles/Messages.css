@@ -135,39 +135,28 @@
 
 /* Mobile View */
 @media (max-width: 768px) {
-  .messages-page {
-    flex-direction: column;
-  }
-
   .contact-list {
+    display: block;
     width: 100%;
     height: 100vh;
-    display: block;
   }
 
   .chat-area {
-    position: absolute;
-    top: 0;
-    left: 0;
+    display: none;
     width: 100%;
     height: 100vh;
-    background: #e9eef6;
-    display: none;
-    flex-direction: column;
   }
 
   .chat-area.active {
     display: flex;
-  }
-
-  .chat-header .back-icon {
-    display: inline;
+    flex-direction: column;
   }
 
   .contact-list.hidden {
     display: none;
   }
 }
+
 
 
 

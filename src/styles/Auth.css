@@ -46,7 +46,7 @@
 }
 
 .auth-box span {
-  color: #2575fc;
+  color: #6a9bef;
   cursor: pointer;
   text-decoration: underline;
 }
@@ -101,7 +101,7 @@
 .auth-form button {
   width: 90%;
   padding: 10px;
-  background: rgb(36, 36, 202);
+  background: rgb(68, 68, 156);
   color: white;
   font-size: 1rem;
   font-weight: 600;

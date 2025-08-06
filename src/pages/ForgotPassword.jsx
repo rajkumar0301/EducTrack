@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { supabase } from "../supabaseClient";
-import "../styles/Auth.css";
+import "../styles/forget.css";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -10,7 +10,7 @@ const ForgotPassword = () => {
     e.preventDefault();
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: "https://educ-track.vercel.app/update-password",
+      redirectTo: "http://localhost:3000/update-password",
     });
 
     if (error) {

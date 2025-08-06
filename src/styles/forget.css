@@ -1,0 +1,90 @@
+/* AuthForm.css */
+
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90vh;
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.auth-card {
+  background: #ffffff;
+  padding: 20px 30px;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.auth-card h2 {
+  margin-bottom: 24px;
+  color: #222;
+  font-size: 26px;
+}
+
+.auth-card input {
+  width: 85%;
+  padding: 12px 14px;
+  margin-bottom: 18px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.25s;
+}
+
+.auth-card input:focus {
+  border-color: #6a11cb;
+  box-shadow: 0 0 0 2px rgba(106, 17, 203, 0.2);
+}
+
+.auth-card button {
+  width: 90%;
+  padding: 12px;
+  background: #6a11cb;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.auth-card button:hover {
+  background: #5011a6;
+}
+
+.auth-card .toggle-link {
+  margin-top: 18px;
+  font-size: 14px;
+  color: #444;
+}
+
+.auth-card .toggle-link a {
+  color: #6a11cb;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.auth-card .toggle-link a:hover {
+  text-decoration: underline;
+}
+
+.auth-message {
+  margin-top: 12px;
+  font-size: 14px;
+  color: green;
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 30px 20px;
+  }
+}

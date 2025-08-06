@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import "../styles/Auth.css";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { supabase } from "../supabaseClient";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "../supabaseClient"; // if using Supabase
 
 const UpdatePassword = () => {
   const [password, setPassword] = useState("");
@@ -18,25 +18,18 @@ const UpdatePassword = () => {
     e.preventDefault();
 
     if (password !== confirm) {
-      alert("Passwords do not match");
+      alert("Passwords do not match!");
       return;
     }
 
-    const { error } = await supabase.auth.updateUser({
-      password: password,
-    });
+    // Supabase password update logic (or your backend API)
+    const { error } = await supabase.auth.updateUser({ password });
 
     if (error) {
-      console.error("Password update failed:", error.message);
-      alert("Session expired or invalid link. Please try resetting again.");
+      alert(error.message);
     } else {
       alert("Password updated successfully!");
-
-      // logout after update
-      await supabase.auth.signOut();
-
-      // redirect to login page
-      navigate("/login");
+      navigate("/login"); // ⬅️ Redirect to login page
     }
   };
 
@@ -76,7 +69,6 @@ const UpdatePassword = () => {
 };
 
 export default UpdatePassword;
-
 
 
 

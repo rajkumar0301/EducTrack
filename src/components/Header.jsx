@@ -4,43 +4,59 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 
 const Header = ({ toggleSidebar }) => {
-  const [avatarUrl, setAvatarUrl] = useState("/images/profile.png");
-  const [cacheBuster, setCacheBuster] = useState(Date.now()); // 🆕 used for forcing image refresh
+  const [avatarUrl, setAvatarUrl] = useState(null);
+  const [initials, setInitials] = useState("");
+  const [cacheBuster, setCacheBuster] = useState(Date.now());
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchAvatar = async () => {
-      const {
-        data: { user },
-        error,
-      } = await supabase.auth.getUser();
+  const fetchUser = async () => {
+    const { data: { user }, error } = await supabase.auth.getUser();
+    if (!user || error) return;
 
-      if (error || !user) return;
+    const avatar = user.user_metadata?.avatar_url;
+    const email = user.email;
+    const fullName = user.user_metadata?.name || "";
 
-      const userAvatar = user.user_metadata?.avatar_url;
-      if (userAvatar) {
-        setAvatarUrl(userAvatar);
-        setCacheBuster(Date.now()); // 🆕 update to force refresh
-      }
-    };
+    setAvatarUrl(avatar || null);
 
-    fetchAvatar();
-  }, []);
+    const nameParts = (fullName || email || "U")
+      .split(/[@\s.]/)
+      .filter(Boolean);
+
+    const initials = nameParts[0]?.charAt(0).toUpperCase() +
+      (nameParts[1]?.charAt(0).toUpperCase() || "");
+    setInitials(initials);
+    setCacheBuster(Date.now());
+  };
+
+  fetchUser();
+
+  // 🔁 Listen for update events
+  const handleProfileUpdate = () => {
+    fetchUser();
+  };
+
+  window.addEventListener("profileUpdated", handleProfileUpdate);
+  return () => window.removeEventListener("profileUpdated", handleProfileUpdate);
+}, []);
+
 
   return (
     <header className="header">
       <div className="menu-icon" onClick={toggleSidebar}>☰</div>
       <div className="app-name">EducTrack</div>
+
       <div className="profile" onClick={() => navigate("/profile")}>
-        <img
-          src={
-            avatarUrl
-              ? `${avatarUrl}?t=${cacheBuster}` // ✅ Add timestamp to force fresh image
-              : "/images/profile.png"
-          }
-          alt=""
-          className="profile-img"
-        />
+        {avatarUrl ? (
+          <img
+            src={`${avatarUrl}?t=${cacheBuster}`}
+            alt="profile"
+            className="profile-img"
+          />
+        ) : (
+          <div className="profile-initials">{initials}</div>
+        )}
       </div>
     </header>
   );

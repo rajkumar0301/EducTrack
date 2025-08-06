@@ -33,11 +33,12 @@
 
 .sidebar-top {
   /* margin-top: 60px; */
-  padding: 0.4rem;
+  padding: 0.1rem;
   background: rgba(255,255,255,0.1); /* transparent if you're using glass effect */
   font-weight: bold;
   color: #090909;  /* if dark background */
   text-align: center;
+  font-size:smaller;
 }
 
 

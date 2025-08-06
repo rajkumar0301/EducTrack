@@ -1,34 +1,30 @@
-import React, { useEffect, useState } from "react";
-import { supabase } from "../supabaseClient";
-import "../styles/Messages.css";
+import { useEffect, useState } from 'react';
+import { supabase } from '../supabaseClient';
+import { useUser } from '@supabase/auth-helpers-react';
 
-const ContactList = ({ user, onSelectUser }) => {
-  const [contacts, setContacts] = useState([]);
+const ContactList = ({ onSelectUser }) => {
+  const { user } = useUser();
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    const fetchContacts = async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .neq("id", user.id);
-      if (data) setContacts(data);
+    const fetchUsers = async () => {
+      const { data, error } = await supabase.from('users').select('*');
+      const filtered = data?.filter((u) => u.id !== user?.id);
+      setUsers(filtered || []);
     };
-    fetchContacts();
+
+    fetchUsers();
   }, [user]);
 
   return (
-    <div className="contact-list-wrapper">
-      <h2>Contacts</h2>
-      {contacts.map((contact) => (
+    <div className="overflow-y-auto p-2">
+      {users.map((u) => (
         <div
-          key={contact.id}
-          className="contact-item"
-          onClick={() => onSelectUser(contact)}
+          key={u.id}
+          onClick={() => onSelectUser(u)}
+          className="p-2 hover:bg-blue-100 cursor-pointer rounded"
         >
-          <img src={contact.avatar_url || "/default-avatar.png"} alt="Avatar" />
-          <div>
-            <p>{contact.full_name || contact.email}</p>
-          </div>
+          {u.email}
         </div>
       ))}
     </div>
@@ -36,6 +32,48 @@ const ContactList = ({ user, onSelectUser }) => {
 };
 
 export default ContactList;
+
+
+
+
+// import React, { useEffect, useState } from "react";
+// import { supabase } from "../supabaseClient";
+// import "../styles/ContactList.css";
+
+// const ContactList = ({ onUserSelect }) => {
+//   const [users, setUsers] = useState([]);
+
+//   useEffect(() => {
+//     fetchUsers();
+//   }, []);
+
+//   const fetchUsers = async () => {
+//     const { data, error } = await supabase.auth.admin.listUsers();
+
+//     if (error) {
+//       console.error("Error fetching users:", error);
+//     } else {
+//       setUsers(data.users);
+//     }
+//   };
+
+//   return (
+//     <div className="contact-list">
+//       <h3>Contacts</h3>
+//       {users.map((user) => (
+//         <div
+//           key={user.id}
+//           className="contact-item"
+//           onClick={() => onUserSelect(user)}
+//         >
+//           {user.email}
+//         </div>
+//       ))}
+//     </div>
+//   );
+// };
+
+// export default ContactList;
 
 
 

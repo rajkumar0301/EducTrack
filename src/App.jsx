@@ -21,7 +21,7 @@ import { supabase } from "./supabaseClient";
 import { UserProvider } from "./contexts/UserContext";
 
 const AppLayout = ({ toggleSidebar, showSidebar, setShowSidebar, handleLogout, currentUser }) => {
-  const [setSelectedGroupId] = useState(null);
+  // const [setSelectedGroupId] = useState(null);
 
   useEffect(() => {
     const theme = localStorage.getItem("theme");

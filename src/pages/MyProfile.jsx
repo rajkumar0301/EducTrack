@@ -112,6 +112,7 @@ const MyProfile = () => {
 
     if (error) toast.error("Error saving data");
     else toast.success("Profile updated successfully");
+    window.dispatchEvent(new Event("profileUpdated")); 
   };
 
   const handleAddEducation = async () => {

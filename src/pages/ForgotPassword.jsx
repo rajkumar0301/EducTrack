@@ -10,7 +10,7 @@ const ForgotPassword = () => {
     e.preventDefault();
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: "http://localhost:3000/update-password",
+      redirectTo: "https://educ-track.vercel.app/update-password",
     });
 
     if (error) {

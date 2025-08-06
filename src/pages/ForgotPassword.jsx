@@ -1,43 +1,71 @@
-// src/pages/ForgotPassword.jsx
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 import "../styles/Auth.css";
+import { FaLock } from "react-icons/fa";
 
-const ForgotPassword = () => {
-  const [email, setEmail] = useState("");
+const UpdatePassword = () => {
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const navigate = useNavigate();
 
-  const handleReset = async (e) => {
+  const handleUpdate = async (e) => {
     e.preventDefault();
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: "https://mplgyeorjoavixtxrbtr.supabase.co/update-password",
+    if (password !== confirm) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    const { error } = await supabase.auth.updateUser({
+      password,
     });
 
     if (error) {
       alert("Error: " + error.message);
     } else {
-      alert("Password reset link sent! Check your email.");
+      alert("Password updated. Please log in again.");
+      await supabase.auth.signOut(); // clear session
+      navigate("/login"); // redirect to login page
     }
   };
 
   return (
     <div className="auth-container">
-      <form className="auth-form" onSubmit={handleReset}>
-        <h2>Forgot Password</h2>
-        <input
-          type="email"
-          placeholder="Enter your email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <button type="submit">Send Reset Link</button>
+      <form className="auth-form" onSubmit={handleUpdate}>
+        <h2>Set New Password</h2>
+
+        <div className="input-wrapper">
+          <input
+            type="password"
+            placeholder="New Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <span className="icon">
+            <FaLock />
+          </span>
+        </div>
+
+        <div className="input-wrapper">
+          <input
+            type="password"
+            placeholder="Confirm Password"
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+          />
+          <span className="icon">
+            <FaLock />
+          </span>
+        </div>
+
+        <button type="submit">Update Password</button>
       </form>
     </div>
   );
 };
 
-export default ForgotPassword;
+export default UpdatePassword;
 
 
 

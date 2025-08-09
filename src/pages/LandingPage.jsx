@@ -1,60 +1,82 @@
-// src/pages/LandingPage.jsx
 import React from "react";
-import { Link } from "react-router-dom";
-import { FaTasks, FaChalkboardTeacher, FaCloudUploadAlt } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import "../styles/LandingPage.css";
 
-export default function LandingPage() {
+const LandingPage = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="landing-container">
       {/* Navbar */}
       <header className="navbar">
-        <div className="navbar-content">
-          <h1 className="logo">EduTrack</h1>
-          <nav>
-            <Link to="/login" className="nav-link">Login</Link>
-            <Link to="/register" className="nav-btn">Get Started</Link>
-          </nav>
-        </div>
+        <div className="logo">EduTrack</div>
+        <nav>
+          <ul>
+            <li onClick={() => navigate("/")}>Home</li>
+            <li onClick={() => navigate("/about")}>About</li>
+            <li onClick={() => navigate("/contact")}>Contact</li>
+            <li>
+              <button
+                className="login-btn"
+                onClick={() => navigate("/login")}
+              >
+                Login
+              </button>
+            </li>
+          </ul>
+        </nav>
       </header>
 
       {/* Hero Section */}
       <section className="hero">
-        <h2>Smart Education Platform</h2>
-        <p>
-          Track your attendance, manage tasks, and check your progress — all in one place.
-        </p>
-        <div className="hero-buttons">
-          <Link to="/register" className="btn-primary">Get Started</Link>
-          <Link to="/login" className="btn-outline">Login</Link>
+        <div className="hero-text">
+          <h1>Smart Education Platform for Modern Learning 📚</h1>
+          <p>
+            Track your classes, assignments, and performance all in one place.
+            Join EduTrack today and make learning more organized and fun.
+          </p>
+          <div className="hero-buttons">
+            <button onClick={() => navigate("/register")}>Get Started</button>
+            <button className="outline" onClick={() => navigate("/about")}>
+              Learn More
+            </button>
+          </div>
+        </div>
+        <div className="hero-image">
+          <img
+            src="https://via.placeholder.com/500x350"
+            alt="EduTrack illustration"
+          />
         </div>
       </section>
 
       {/* Features Section */}
       <section className="features">
-        <div className="feature-card">
-          <FaChalkboardTeacher className="feature-icon" />
-          <h3>Attendance Tracking</h3>
-          <p>Keep a close eye on your attendance and never miss a class.</p>
-        </div>
-        <div className="feature-card">
-          <FaCloudUploadAlt className="feature-icon" />
-          <h3>File Upload</h3>
-          <p>Easily upload and access your study materials anytime.</p>
-        </div>
-        <div className="feature-card">
-          <FaTasks className="feature-icon" />
-          <h3>Task Management</h3>
-          <p>Organize and track your assignments efficiently.</p>
+        <h2>Why Choose EduTrack?</h2>
+        <div className="features-grid">
+          <div className="feature-card">
+            <h3>📅 Attendance Tracking</h3>
+            <p>Keep a perfect record of your class attendance with ease.</p>
+          </div>
+          <div className="feature-card">
+            <h3>📁 File Management</h3>
+            <p>Upload and organize study materials in one secure location.</p>
+          </div>
+          <div className="feature-card">
+            <h3>✅ Task Management</h3>
+            <p>Stay ahead with task deadlines and progress tracking.</p>
+          </div>
         </div>
       </section>
 
       {/* Footer */}
       <footer className="footer">
-        © {new Date().getFullYear()} EduTrack — Smart Education Platform
+        <p>© {new Date().getFullYear()} EduTrack. All Rights Reserved.</p>
       </footer>
     </div>
   );
-}
+};
+
+export default LandingPage;
 
 

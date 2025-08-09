@@ -1,82 +1,72 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import "../styles/LandingPage.css";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import "./LandingPage.css";
 
 const LandingPage = () => {
-  const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <div className="landing-container">
       {/* Navbar */}
-      <header className="navbar">
+      <nav className="navbar">
         <div className="logo">EduTrack</div>
-        <nav>
-          <ul>
-            <li onClick={() => navigate("/")}>Home</li>
-            <li onClick={() => navigate("/about")}>About</li>
-            <li onClick={() => navigate("/contact")}>Contact</li>
-            <li>
-              <button
-                className="login-btn"
-                onClick={() => navigate("/login")}
-              >
-                Login
-              </button>
-            </li>
-          </ul>
-        </nav>
-      </header>
+        <div className={`nav-links ${menuOpen ? "open" : ""}`}>
+          <Link to="/">Home</Link>
+          <Link to="/login">Login</Link>
+          <Link to="/register">Register</Link>
+        </div>
+        <div
+          className={`hamburger ${menuOpen ? "active" : ""}`}
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </nav>
 
       {/* Hero Section */}
       <section className="hero">
-        <div className="hero-text">
-          <h1>Smart Education Platform for Modern Learning 📚</h1>
-          <p>
-            Track your classes, assignments, and performance all in one place.
-            Join EduTrack today and make learning more organized and fun.
-          </p>
-          <div className="hero-buttons">
-            <button onClick={() => navigate("/register")}>Get Started</button>
-            <button className="outline" onClick={() => navigate("/about")}>
-              Learn More
-            </button>
-          </div>
-        </div>
-        <div className="hero-image">
-          <img
-            src="https://via.placeholder.com/500x350"
-            alt="EduTrack illustration"
-          />
+        <h1>Smart Learning, Simplified</h1>
+        <p>
+          Manage attendance, tasks, classes, and academic progress – all in one place.
+        </p>
+        <div className="hero-buttons">
+          <Link to="/register" className="btn primary">Get Started</Link>
+          <Link to="/login" className="btn secondary">Login</Link>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="features">
+      {/* Why Choose Section */}
+      <section className="why-choose">
         <h2>Why Choose EduTrack?</h2>
-        <div className="features-grid">
-          <div className="feature-card">
-            <h3>📅 Attendance Tracking</h3>
-            <p>Keep a perfect record of your class attendance with ease.</p>
-          </div>
-          <div className="feature-card">
-            <h3>📁 File Management</h3>
-            <p>Upload and organize study materials in one secure location.</p>
-          </div>
-          <div className="feature-card">
-            <h3>✅ Task Management</h3>
-            <p>Stay ahead with task deadlines and progress tracking.</p>
+        <div className="slider">
+          <div className="slider-track">
+            <div className="card">📅 Attendance Tracking</div>
+            <div className="card">📂 File Upload</div>
+            <div className="card">✅ Task Management</div>
+            <div className="card">📊 CGPA & Percentage Checker</div>
+            <div className="card">💬 Messaging</div>
+            <div className="card">⚙️ Easy Settings</div>
+            {/* Duplicate for seamless loop */}
+            <div className="card">📅 Attendance Tracking</div>
+            <div className="card">📂 File Upload</div>
+            <div className="card">✅ Task Management</div>
+            <div className="card">📊 CGPA & Percentage Checker</div>
+            <div className="card">💬 Messaging</div>
+            <div className="card">⚙️ Easy Settings</div>
           </div>
         </div>
       </section>
 
       {/* Footer */}
       <footer className="footer">
-        <p>© {new Date().getFullYear()} EduTrack. All Rights Reserved.</p>
+        <p>© {new Date().getFullYear()} EduTrack. All rights reserved.</p>
       </footer>
     </div>
   );
 };
 
-export default LandingPage;
+export default LandingPage;;
 
 

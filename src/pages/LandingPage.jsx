@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../styles/LandingPage.css";
+import '../styles/LandingPage.css';
 
 export default function LandingPage() {
   const [menuOpen, setMenuOpen] = useState(false);

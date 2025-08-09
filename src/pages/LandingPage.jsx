@@ -1,9 +1,23 @@
-// src/pages/LandingPage.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/LandingPage.css";
 
 export default function LandingPage() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrollIndex, setScrollIndex] = useState(0);
+
+  // Auto-scroll testimonials
+  useEffect(() => {
+    const slider = document.querySelector(".testimonial-slider");
+    const scrollTestimonials = setInterval(() => {
+      if (slider) {
+        slider.scrollBy({ left: 300, behavior: "smooth" });
+        if (slider.scrollLeft + slider.clientWidth >= slider.scrollWidth) {
+          slider.scrollTo({ left: 0, behavior: "smooth" });
+        }
+      }
+    }, 2500);
+    return () => clearInterval(scrollTestimonials);
+  }, []);
 
   return (
     <div className="landing">
@@ -11,19 +25,24 @@ export default function LandingPage() {
       <nav className="navbar">
         <div className="logo">EduTrack</div>
         <ul className={`nav-links ${menuOpen ? "open" : ""}`}>
-          <li><a href="#home">Home</a></li>
-          <li><a href="#about">About</a></li>
-          <li><a href="#features">Features</a></li>
-          <li><a href="#testimonials">Testimonials</a></li>
-          <li><a href="#contact">Contact</a></li>
+          <li><a href="#home" onClick={() => setMenuOpen(false)}>Home</a></li>
+          <li><a href="#about" onClick={() => setMenuOpen(false)}>About</a></li>
+          <li><a href="#features" onClick={() => setMenuOpen(false)}>Features</a></li>
+          <li><a href="#testimonials" onClick={() => setMenuOpen(false)}>Testimonials</a></li>
+          <li><a href="#contact" onClick={() => setMenuOpen(false)}>Contact</a></li>
         </ul>
-        <div className={`hamburger ${menuOpen ? "open" : ""}`} onClick={() => setMenuOpen(!menuOpen)}>
-          <span></span><span></span><span></span>
+        <div
+          className={`hamburger ${menuOpen ? "open" : ""}`}
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section id="home" className="hero">
+      <section id="home" className="hero fade-in">
         <div className="hero-text">
           <h1>Track. Learn. Succeed.</h1>
           <p>EduTrack is your smart companion for managing classes, grades, attendance, and more.</p>
@@ -35,7 +54,7 @@ export default function LandingPage() {
       </section>
 
       {/* About */}
-      <section id="about" className="about">
+      <section id="about" className="about fade-in">
         <h2>About Us</h2>
         <p>
           EduTrack is built for students and educators to streamline academic life. 
@@ -44,7 +63,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features */}
-      <section id="features" className="features">
+      <section id="features" className="features fade-in">
         <h2>Features</h2>
         <div className="feature-grid">
           <div className="feature-card">📅 Class Scheduling</div>
@@ -55,17 +74,18 @@ export default function LandingPage() {
       </section>
 
       {/* Testimonials */}
-      <section id="testimonials" className="testimonials">
+      <section id="testimonials" className="testimonials fade-in">
         <h2>What Our Users Say</h2>
         <div className="testimonial-slider">
           <div className="testimonial">"EduTrack changed my academic life!" – Aditi</div>
           <div className="testimonial">"Simple, fast, and effective." – Rahul</div>
           <div className="testimonial">"Keeps me organized every semester." – Priya</div>
+          <div className="testimonial">"Highly recommend to all students!" – Arjun</div>
         </div>
       </section>
 
       {/* Contact */}
-      <section id="contact" className="contact">
+      <section id="contact" className="contact fade-in">
         <h2>Contact Us</h2>
         <form>
           <input type="text" placeholder="Your Name" required />

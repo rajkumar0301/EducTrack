@@ -1,0 +1,144 @@
+/* Main Container */
+.landing-container {
+  font-family: Arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Navbar */
+.navbar {
+  background-color: #1E88E5;
+  color: white;
+  padding: 15px 0;
+}
+
+.navbar-content {
+  width: 90%;
+  max-width: 1200px;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.nav-link {
+  margin-right: 20px;
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.nav-link:hover {
+  text-decoration: underline;
+}
+
+.nav-btn {
+  background: white;
+  color: #1E88E5;
+  padding: 8px 16px;
+  border-radius: 5px;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.nav-btn:hover {
+  background: #f1f1f1;
+}
+
+/* Hero Section */
+.hero {
+  background: linear-gradient(90deg, #1E88E5, #42A5F5);
+  color: white;
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.hero h2 {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+}
+
+.hero p {
+  font-size: 1.1rem;
+  margin-bottom: 30px;
+}
+
+.hero-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.btn-primary {
+  background: white;
+  color: #1E88E5;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.btn-primary:hover {
+  background: #f1f1f1;
+}
+
+.btn-outline {
+  border: 2px solid white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  color: white;
+  text-decoration: none;
+}
+
+.btn-outline:hover {
+  background: white;
+  color: #1E88E5;
+}
+
+/* Features Section */
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  width: 90%;
+  max-width: 1200px;
+  margin: 40px auto;
+}
+
+.feature-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.feature-icon {
+  font-size: 50px;
+  color: #1E88E5;
+  margin-bottom: 10px;
+}
+
+.feature-card h3 {
+  margin-bottom: 10px;
+}
+
+.feature-card p {
+  color: #555;
+}
+
+/* Footer */
+.footer {
+  background: #1E88E5;
+  color: white;
+  text-align: center;
+  padding: 15px;
+  margin-top: auto;
+}

@@ -1,57 +1,82 @@
-// src/pages/LandingPage.jsx
-import React from "react";
-import { Link } from "react-router-dom";
-import { FaTasks, FaChalkboardTeacher, FaCloudUploadAlt } from "react-icons/fa";
-import "../styles/LandingPage.css";
+import React, { useState } from "react";
+import '../styles/LandingPage.css';
 
 export default function LandingPage() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
-    <div className="landing-container">
+    <div className="landing">
       {/* Navbar */}
-      <header className="navbar">
-        <div className="navbar-content">
-          <h1 className="logo">EduTrack</h1>
-          <nav>
-            <Link to="/login" className="nav-link">Login</Link>
-            <Link to="/register" className="nav-btn">Get Started</Link>
-          </nav>
+      <nav className="navbar">
+        <div className="logo">EduTrack</div>
+        <ul className={menuOpen ? "nav-links open" : "nav-links"}>
+          <li><a href="#home" onClick={() => setMenuOpen(false)}>Home</a></li>
+          <li><a href="#about" onClick={() => setMenuOpen(false)}>About</a></li>
+          <li><a href="#features" onClick={() => setMenuOpen(false)}>Features</a></li>
+          <li><a href="#contact" onClick={() => setMenuOpen(false)}>Contact</a></li>
+        </ul>
+        <div
+          className={`hamburger ${menuOpen ? "active" : ""}`}
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          <span></span><span></span><span></span>
         </div>
-      </header>
+      </nav>
 
       {/* Hero Section */}
-      <section className="hero">
-        <h2>Smart Education Platform</h2>
-        <p>
-          Track your attendance, manage tasks, and check your progress — all in one place.
-        </p>
-        <div className="hero-buttons">
-          <Link to="/register" className="btn-primary">Get Started</Link>
-          <Link to="/login" className="btn-outline">Login</Link>
+      <section id="home" className="hero">
+        <div className="hero-content">
+          <h1>Track. Learn. Succeed.</h1>
+          <p>Your smart education companion — manage tasks, classes, and performance in one place.</p>
+          <a href="/register" className="btn-primary">Get Started</a>
+        </div>
+        <div className="hero-img">
+          <img src="/hero-image.png" alt="EduTrack" />
         </div>
       </section>
 
+      {/* About Section */}
+      <section id="about" className="about">
+        <h2>About Us</h2>
+        <p>
+          EduTrack is designed for students and educators to streamline learning and teaching experiences.
+          From attendance to assignments, we bring everything to your fingertips.
+        </p>
+      </section>
+
       {/* Features Section */}
-      <section className="features">
-        <div className="feature-card">
-          <FaChalkboardTeacher className="feature-icon" />
-          <h3>Attendance Tracking</h3>
-          <p>Keep a close eye on your attendance and never miss a class.</p>
+      <section id="features" className="features">
+        <h2>Features</h2>
+        <div className="feature-cards">
+          <div className="card">
+            <h3>Task Management</h3>
+            <p>Stay on top of deadlines with smart reminders.</p>
+          </div>
+          <div className="card">
+            <h3>Attendance Tracking</h3>
+            <p>Monitor your attendance easily and efficiently.</p>
+          </div>
+          <div className="card">
+            <h3>Grade Analytics</h3>
+            <p>Check CGPA and percentage instantly with visual reports.</p>
+          </div>
         </div>
-        <div className="feature-card">
-          <FaCloudUploadAlt className="feature-icon" />
-          <h3>File Upload</h3>
-          <p>Easily upload and access your study materials anytime.</p>
-        </div>
-        <div className="feature-card">
-          <FaTasks className="feature-icon" />
-          <h3>Task Management</h3>
-          <p>Organize and track your assignments efficiently.</p>
-        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="contact">
+        <h2>Contact Us</h2>
+        <form>
+          <input type="text" placeholder="Your Name" required />
+          <input type="email" placeholder="Your Email" required />
+          <textarea placeholder="Your Message" required></textarea>
+          <button type="submit">Send Message</button>
+        </form>
       </section>
 
       {/* Footer */}
       <footer className="footer">
-        © {new Date().getFullYear()} EduTrack — Smart Education Platform
+        <p>© {new Date().getFullYear()} EduTrack. All rights reserved.</p>
       </footer>
     </div>
   );

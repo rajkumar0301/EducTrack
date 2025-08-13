@@ -32,7 +32,7 @@ const Login = () => {
       </div>
       <div className="auth-content">
         <h2>Welcome Back</h2>
-        <p className="auth-tagline">Continue your learning adventure with EduTrack.</p>
+        <p className="auth-tagline">Continue your learning adventure with EducTrack.</p>
         <input type="email" placeholder="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} />
         <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
 
@@ -170,3 +170,4 @@ export default Login;
 // };
 
 // export default Login;
+

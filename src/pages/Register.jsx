@@ -39,7 +39,7 @@ const Register = () => {
         <img src={registerImage} alt="Register" />
       </div>
       <div className="auth-content">
-        <h2>Join EduTrack</h2>
+        <h2>Join EducTrack</h2>
         <p className="auth-tagline">Your journey to smarter learning starts here.</p>
         <input type="text" placeholder="Full Name" value={name} onChange={(e) => setName(e.target.value)} />
         <input type="text" placeholder="Mobile Number" value={mobile} onChange={(e) => setMobile(e.target.value)} />
@@ -113,3 +113,4 @@ export default Register;
 // };
 
 // export default Register;
+
